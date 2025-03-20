@@ -1,0 +1,153 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7fa;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 350px;
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: white;
+    padding: 20px;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.sidebar h2 {
+    margin: 0 0 20px;
+    font-size: 24px;
+    text-align: center;
+    color: #ecf0f1;
+}
+
+.map-container {
+    flex: 1;
+    position: relative;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+.info {
+    padding: 10px 15px;
+    font: 14px/16px 'Segoe UI', Arial, sans-serif;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.info h2 {
+    margin: 0 0 5px;
+    color: #2c3e50;
+    font-size: 18px;
+}
+
+#instructions {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 12px;
+    border-radius: 5px;
+    font: 12px 'Segoe UI', Arial, sans-serif;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.control-pane {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+}
+
+.control-pane label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.control-pane input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.control-pane input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+.control-pane button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#findPathButton {
+    background-color: #27ae60;
+    color: white;
+}
+
+#findPathButton:hover {
+    background-color: #219653;
+    transform: translateY(-2px);
+}
+
+#resetButton {
+    background-color: #e74c3c;
+    color: white;
+}
+
+#resetButton:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+.route-plan {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    color: #2c3e50;
+}
+
+.route-plan h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: #2c3e50;
+}
+
+.route-plan ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.route-plan li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.route-plan li:last-child {
+    border-bottom: none;
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calgary Road Network - Path Finder</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="config.js"></script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Route Planner</h2>
+            <div id="controlPane" class="control-pane">
+                <label for="startLocation">Start Location:</label>
+                <input type="text" id="startLocation" placeholder="e.g., Calgary Tower" style="width: 100%;"><br>
+                <label for="endLocation">End Location:</label>
+                <input type="text" id="endLocation" placeholder="e.g., 154 SE Rosebrook Rise, Calgary" style="width: 100%;"><br>
+                <button id="findPathButton">Find Path</button>
+                <button id="resetButton">Reset</button>
+                <p style="font-size: 12px; margin-top: 10px;">Or enter coordinates manually below (latitude, longitude):</p>
+                <label for="startLat">Start Coord:</label>
+                <input type="number" id="startLat" step="0.0001" placeholder="Latitude" style="width: 45%;">
+                <input type="number" id="startLon" step="0.0001" placeholder="Longitude" style="width: 45%;"><br>
+                <label for="endLat">End Coord:</label>
+                <input type="number" id="endLat" step="0.0001" placeholder="Latitude" style="width: 45%;">
+                <input type="number" id="endLon" step="0.0001" placeholder="Longitude" style="width: 45%;">
+            </div>
+            <div id="routePlan" class="route-plan">
+                <h3>Route Plan</h3>
+                <ul id="routeSteps"></ul>
+            </div>
+        </div>
+        <div class="map-container">
+            <div id="map"></div>
+            <div id="instructions">Click to set Start (green), then End (red). Path will appear in blue. Or use the pane on the left.</div>
+        </div>
+    </div>
+</body>
+</html>

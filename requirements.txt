@@ -1,0 +1,11 @@
+osmnx 
+geopandas 
+geojson
+flask
+networkx 
+geopandas
+flask-cors
+scikit-learn
+python-dotenv
+requests
+os
