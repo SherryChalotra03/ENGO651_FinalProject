@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="chatbot.css">
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
@@ -25,7 +26,7 @@
                 <input type="text" id="endLocation" placeholder="e.g., 154 SE Rosebrook Rise, Calgary" style="width: 100%;"><br>
                 <button id="findPathButton">Find Path</button>
                 <button id="resetButton">Reset</button>
-                <p style="font-size: 12px; margin-top: 10px;">Or enter coordinates manually below (latitude, longitude):</p>
+                <p style="font-size: 12px; margin-top: 10px; color: red">Or enter coordinates manually below (latitude, longitude):</p>
                 <label for="startLat">Start Coord:</label>
                 <input type="number" id="startLat" step="0.0001" placeholder="Latitude" style="width: 45%;">
                 <input type="number" id="startLon" step="0.0001" placeholder="Longitude" style="width: 45%;"><br>
@@ -41,6 +42,22 @@
         <div class="map-container">
             <div id="map"></div>
             <div id="instructions">Click to set Start (green), then End (red). Path will appear in blue. Or use the pane on the left.</div>
+        </div>
+        <!-- Chat Interface -->
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <h3>Route Assistant</h3>
+            <button class="chat-toggle" id="chatToggle">−</button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-message bot">
+                <div class="message-content">Hello! I can help you find routes in Calgary. Try saying something like: "Find a route from Calgary Tower to 154 SE Rosebrook Rise, Calgary."</div>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Type your message...">
+            <button id="chatSend">Send</button>
         </div>
     </div>
 </body>

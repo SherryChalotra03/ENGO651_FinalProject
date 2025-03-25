@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            async function findPath() {
+            async function findPath() { //previous findpath() function starts from here
                 let start = startPoint;
                 let end = endPoint;
 
@@ -247,7 +247,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     info.update({ message: 'Pathfinding failed. Check console for details.' });
                     document.getElementById('routeSteps').innerHTML = '<li>Error finding route.</li>';
                 });
-            }
+            } //previous findpath() function ends here
+
 
             // GUI button event listeners
             document.getElementById('findPathButton').addEventListener('click', function () {
@@ -322,9 +323,121 @@ document.addEventListener('DOMContentLoaded', function () {
             };
 
             info.addTo(map);
+
+            const chatContainer = document.getElementById('chatContainer');
+            const chatBody = document.getElementById('chatBody');
+            const chatInput = document.getElementById('chatInput');
+            const chatSend = document.getElementById('chatSend');
+            const chatToggle = document.getElementById('chatToggle');
+            let isChatMinimized = false;
+
+            function addChatMessage(message, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${sender}`;
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.textContent = message;
+                messageDiv.appendChild(contentDiv);
+                chatBody.appendChild(messageDiv);
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+
+            chatSend.addEventListener('click', function () {
+                const message = chatInput.value.trim();
+                if (!message) return;
+
+                // Add user message to chat
+                addChatMessage(message, 'user');
+                chatInput.value = '';
+
+                // Send message to backend
+                fetch('http://localhost:5000/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        addChatMessage(data.error, 'bot');
+                        return;
+                    }
+
+                    // Add bot response to chat
+                    addChatMessage(data.response, 'bot');
+
+                    // Update the map with the route
+                    if (data.route_geojson) {
+                        if (startMarker) map.removeLayer(startMarker);
+                        if (endMarker) map.removeLayer(endMarker);
+                        if (pathLayer) map.removeLayer(pathLayer);
+
+                        startPoint = data.start_coords;
+                        endPoint = data.end_coords;
+                        startMarker = L.marker(startPoint, { icon: greenIcon }).addTo(map).bindPopup('Start').openPopup();
+                        endMarker = L.marker(endPoint, { icon: redIcon }).addTo(map).bindPopup('End').openPopup();
+
+                        pathLayer = L.geoJSON(data.route_geojson, {
+                            style: { color: '#0000ff', weight: 2, opacity: 0.8 }
+                        }).addTo(map);
+                        map.fitBounds(pathLayer.getBounds());
+
+                        // Update the route plan in the sidebar
+                        const routeSteps = document.getElementById('routeSteps');
+                        routeSteps.innerHTML = '';
+                        const roads = new Set();
+                        data.route_geojson.features.forEach(feature => {
+                            const roadName = feature.properties && feature.properties.name ? feature.properties.name : 'Unnamed Road';
+                            roads.add(roadName);
+                        });
+                        const roadList = Array.from(roads);
+                        roadList.forEach((road, index) => {
+                            const li = document.createElement('li');
+                            li.textContent = `Step ${index + 1}: Travel on ${road}`;
+                            routeSteps.appendChild(li);
+                        });
+
+                        info.update({ message: `Path found with ${data.route_geojson.features.length} segments.` });
+                    }
+                })
+                .catch(error => {
+                    console.error('Chat request failed:', error);
+                    addChatMessage('Sorry, something went wrong. Please try again.', 'bot');
+                });
+            });
+
+            chatInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    chatSend.click();
+                }
+            });
+
+            chatToggle.addEventListener('click', function () {
+                if (isChatMinimized) {
+                    chatContainer.style.height = '400px';
+                    chatBody.style.display = 'block';
+                    chatInput.parentElement.style.display = 'flex';
+                    chatToggle.textContent = '−';
+                    isChatMinimized = false;
+                } else {
+                    chatContainer.style.height = '40px';
+                    chatBody.style.display = 'none';
+                    chatInput.parentElement.style.display = 'none';
+                    chatToggle.textContent = '+';
+                    isChatMinimized = true;
+                }
+            });
+
+
+
+
         })
         .catch(error => {
             console.error('Failed to load config from backend:', error);
             alert('Failed to load configuration. Please check if the backend server is running on http://localhost:5000.');
         });
+
+
+        
 });
+

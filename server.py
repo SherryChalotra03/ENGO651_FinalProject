@@ -9,6 +9,12 @@ from dotenv import load_dotenv
 import requests
 import os
 import math
+from alternate_pathfinding import find_alternate_paths
+from chatbot import *
+
+# Print NetworkX version for debugging 
+print("NetworkX version in server.py:", nx.__version__)
+print("k_shortest_paths available in server.py:", hasattr(nx, 'k_shortest_paths'))
 
 # Load environment variables from .env file
 load_dotenv()
@@ -17,20 +23,28 @@ app = Flask(__name__)
 #CORS(app, resources={r"/find_path": {"origins": "http://localhost:8000"}})
 #CORS(app, resources={r"/find_path": {"origins": "http://localhost:8000"}, r"/geocode": {"origins": "http://localhost:8000"}})
 #CORS(app, resources={r"/find_path": {"origins": "http://localhost:8000"}, r"/geocode": {"origins": "http://localhost:8000"}, r"/config": {"origins": "http://localhost:8000"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:8000"}})
 
 # Allow all origins for all endpoints (temporary for debugging)
-CORS(app)
+#CORS(app)
 
 
-#Load road network for Calgary
-G = ox.graph_from_place("Calgary, Alberta, Canada", network_type="drive")
-print("Road network loaded")
-nodes, edges = ox.graph_to_gdfs(G)
-
-# # Load the pre-saved graph from GraphML
-# G = ox.load_graphml(filepath="calgary_roads.graphml")
-# print("Road network loaded from calgary_roads.graphml")
+# #Load road network for Calgary
+# G = ox.graph_from_place("Calgary, Alberta, Canada", network_type="drive")
+# print("Road network loaded")
 # nodes, edges = ox.graph_to_gdfs(G)
+
+# Load the precomputed graph
+print("Loading precomputed graph...")
+try:
+    G = ox.load_graphml("calgary_roads.graphml")
+    print("Graph loaded successfully")
+except Exception as e:
+    print(f"Error loading graph: {str(e)}")
+    raise
+
+nodes, edges = ox.graph_to_gdfs(G)
+print("Nodes and edges converted to GeoDataFrames")
 
 @app.route('/')
 def test():
@@ -61,25 +75,26 @@ def geocode():
 
 @app.route('/find_path', methods=['POST'])
 def find_path():
+     
     data = request.get_json()
     start_lat, start_lon = data['start']
     end_lat, end_lon = data['end']
     print(f"Received: start={start_lat},{start_lon}, end={end_lat},{end_lon}")
-
-    # Validate coordinates are within Calgary bounds (approx)
+ 
+     # Validate coordinates are within Calgary bounds (approx)
     calgary_bounds = {
-        'min_lat': 50.842, 'max_lat': 51.212,
-        'min_lon': -114.315, 'max_lon': -113.860
+         'min_lat': 50.842, 'max_lat': 51.212,
+         'min_lon': -114.315, 'max_lon': -113.860
     }
     if not (calgary_bounds['min_lat'] <= start_lat <= calgary_bounds['max_lat'] and
             calgary_bounds['min_lon'] <= start_lon <= calgary_bounds['max_lon']):
         print("Start point is outside Calgary bounds")
         return jsonify({"error": "Start point is outside Calgary bounds"}), 400
     if not (calgary_bounds['min_lat'] <= end_lat <= calgary_bounds['max_lat'] and
-            calgary_bounds['min_lon'] <= end_lon <= calgary_bounds['max_lon']):
+             calgary_bounds['min_lon'] <= end_lon <= calgary_bounds['max_lon']):
         print("End point is outside Calgary bounds")
         return jsonify({"error": "End point is outside Calgary bounds"}), 400
-    
+
     start_node = ox.distance.nearest_nodes(G, start_lon, start_lat)
     end_node = ox.distance.nearest_nodes(G, end_lon, end_lat)
     print(f"Nearest nodes: start={start_node}, end={end_node}")
@@ -89,13 +104,16 @@ def find_path():
         return jsonify({"error": "One or both points are outside the Calgary road network"}), 400
 
     try:
-        path = nx.shortest_path(G, start_node, end_node, weight='length')
+        #path = nx.shortest_path(G, start_node, end_node, weight='length')
+        path = nx.shortest_path(G, start_node, end_node, weight='travel_time')
         print(f"Path found with {len(path)} nodes")
     except nx.NetworkXNoPath as e:
         print(f"Unexpected pathfinding error: {str(e)}")
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
     features = []
+    total_travel_time = 0  # In seconds
+    total_distance = 0  # In meters
     for u, v in zip(path[:-1], path[1:]):
         try:
             edge_data = G.get_edge_data(u, v)[0]
@@ -111,6 +129,12 @@ def find_path():
                 road_name = edge_gdf.get('ref', None)
             if pd.isna(road_name):
                 road_name = edge_gdf.get('highway', 'Unnamed Road').capitalize()
+                
+            # Accumulate travel time and distance
+            travel_time = edge_data.get('travel_time', 0)
+            total_travel_time += travel_time
+            total_distance += edge_data.get('length', 0)
+               
             print(f"Edge {edge_key}: name={road_name}")
             features.append({
                 "type": "Feature",
@@ -146,6 +170,31 @@ def find_path():
     path_geojson = {"type": "FeatureCollection", "features": features}
     print(f"Returning JSON: {json.dumps(path_geojson)}")  # Debug the exact JSON string
     return jsonify(path_geojson)
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    """
+    Handle chatbot requests.
+    """
+    try:
+        data = request.get_json()
+        user_input = data.get('message', '')
+        if not user_input:
+            return jsonify({"error": "No message provided"}), 400
+
+        geoapify_api_key = os.getenv('GEOAPIFY_API_KEY')
+        if not geoapify_api_key:
+            return jsonify({"error": "Geoapify API key not configured"}), 500
+
+        # Process the chat message
+        result = process_chat_message(user_input, geoapify_api_key)
+        if isinstance(result, dict):
+            return jsonify(result)
+        else:
+            return jsonify({"response": result})
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
