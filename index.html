@@ -3,61 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calgary Road Network - Path Finder</title>
+    <title>Calgary Safe Way - Intelligent Route Planning</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="chatbot.css">
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css" rel="stylesheet" />
     <script src="config.js"></script>
-    <script src="script.js" defer></script>
+    <script src="chatbot.js" type="module"></script>
+    <script src="script.js" type="module" defer></script>
 </head>
 <body>
+    <!-- Header with Project Title -->
+    <header class="app-header">
+        <h1>Calgary Safe Way</h1>
+        <p>Intelligent Route Planning for Calgary</p>
+    </header>
+
+    <!-- Main Container -->
     <div class="container">
+        <!-- Sidebar -->
         <div class="sidebar">
             <h2>Route Planner</h2>
             <div id="controlPane" class="control-pane">
-                <label for="startLocation">Start Location:</label>
-                <input type="text" id="startLocation" placeholder="e.g., Calgary Tower" style="width: 100%;"><br>
-                <label for="endLocation">End Location:</label>
-                <input type="text" id="endLocation" placeholder="e.g., 154 SE Rosebrook Rise, Calgary" style="width: 100%;"><br>
-                <button id="findPathButton">Find Path</button>
-                <button id="resetButton">Reset</button>
-                <p style="font-size: 12px; margin-top: 10px; color: red">Or enter coordinates manually below (latitude, longitude):</p>
-                <label for="startLat">Start Coord:</label>
-                <input type="number" id="startLat" step="0.0001" placeholder="Latitude" style="width: 45%;">
-                <input type="number" id="startLon" step="0.0001" placeholder="Longitude" style="width: 45%;"><br>
-                <label for="endLat">End Coord:</label>
-                <input type="number" id="endLat" step="0.0001" placeholder="Latitude" style="width: 45%;">
-                <input type="number" id="endLon" step="0.0001" placeholder="Longitude" style="width: 45%;">
+                <div class="input-group">
+                    <label for="startLocation">Start Location:</label>
+                    <input type="text" id="startLocation" placeholder="e.g., Calgary Tower">
+                </div>
+                <div class="input-group">
+                    <label for="endLocation">End Location:</label>
+                    <input type="text" id="endLocation" placeholder="e.g., 154 SE Rosebrook Rise, Calgary">
+                </div>
+                <div class="button-group">
+                    <button id="findPathButton">Find Path</button>
+                    <button id="resetButton">Reset</button>
+                </div>
+                <p class="coord-info">Or enter coordinates manually (latitude, longitude):</p>
+                <div class="input-group coord-group">
+                    <label for="startLat">Start Coordinates:</label>
+                    <div class="coord-inputs">
+                        <input type="number" id="startLat" step="0.0001" placeholder="Latitude">
+                        <input type="number" id="startLon" step="0.0001" placeholder="Longitude">
+                    </div>
+                </div>
+                <div class="input-group coord-group">
+                    <label for="endLat">End Coordinates:</label>
+                    <div class="coord-inputs">
+                        <input type="number" id="endLat" step="0.0001" placeholder="Latitude">
+                        <input type="number" id="endLon" step="0.0001" placeholder="Longitude">
+                    </div>
+                </div>
             </div>
             <div id="routePlan" class="route-plan">
                 <h3>Route Plan</h3>
                 <ul id="routeSteps"></ul>
             </div>
         </div>
+
+        <!-- Map Container -->
         <div class="map-container">
             <div id="map"></div>
             <div id="instructions">Click to set Start (green), then End (red). Path will appear in blue. Or use the pane on the left.</div>
-        </div>
-        <!-- Chat Interface -->
-    <div class="chat-container" id="chatContainer">
-        <div class="chat-header">
-            <h3>Route Assistant</h3>
-            <button class="chat-toggle" id="chatToggle">−</button>
-        </div>
-        <div class="chat-body" id="chatBody">
-            <div class="chat-message bot">
-                <div class="message-content">Hello! I can help you find routes in Calgary. Try saying something like: "Find a route from Calgary Tower to 154 SE Rosebrook Rise, Calgary."</div>
+            <!-- Loading Spinner -->
+            <div id="loadingSpinner" class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Finding your route...</p>
             </div>
         </div>
 
-        <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Type your message...">
-            <button id="chatSend">Send</button>
+        <!-- Chat Interface -->
+        <div class="chat-container" id="chatContainer">
+            <div class="chat-header">
+                <h3>Route Assistant</h3>
+                <button class="chat-toggle" id="chatToggle">−</button>
+            </div>
+            <div class="chat-body" id="chatBody">
+                <div class="chat-message bot">
+                    <div class="message-content">Hello! I can help you find routes in Calgary. Try saying something like: "Find a route from Calgary Tower to 154 SE Rosebrook Rise, Calgary."</div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Type your message...">
+                <button id="chatSend">Send</button>
+            </div>
         </div>
     </div>
 </body>

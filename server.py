@@ -104,16 +104,16 @@ def find_path():
         return jsonify({"error": "One or both points are outside the Calgary road network"}), 400
 
     try:
-        #path = nx.shortest_path(G, start_node, end_node, weight='length')
-        path = nx.shortest_path(G, start_node, end_node, weight='travel_time')
+        path = nx.shortest_path(G, start_node, end_node, weight='length')
+        #path = nx.shortest_path(G, start_node, end_node, weight='travel_time')
         print(f"Path found with {len(path)} nodes")
     except nx.NetworkXNoPath as e:
         print(f"Unexpected pathfinding error: {str(e)}")
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
     features = []
-    total_travel_time = 0  # In seconds
-    total_distance = 0  # In meters
+   # total_travel_time = 0  # In seconds
+    total_length = 0  # In meters
     for u, v in zip(path[:-1], path[1:]):
         try:
             edge_data = G.get_edge_data(u, v)[0]
@@ -131,9 +131,9 @@ def find_path():
                 road_name = edge_gdf.get('highway', 'Unnamed Road').capitalize()
                 
             # Accumulate travel time and distance
-            travel_time = edge_data.get('travel_time', 0)
-            total_travel_time += travel_time
-            total_distance += edge_data.get('length', 0)
+           # travel_time = edge_data.get('travel_time', 0)
+            #total_travel_time += travel_time
+            total_length += edge_data.get('length', 0)
                
             print(f"Edge {edge_key}: name={road_name}")
             features.append({
@@ -141,13 +141,16 @@ def find_path():
                 "geometry": geom.__geo_interface__,
                 "properties": {
                     "osmid": edge_gdf['osmid'],
-                    "name": road_name if not pd.isna(road_name) else 'Unnamed Road'  # Nest name under properties
+                    "name": road_name if not pd.isna(road_name) else 'Unnamed Road',  # Nest name under properties
                     # Add other properties as needed (e.g., highway, length)
+                    "length": edge_data.get('length', None)
+                    
                 }
             })
         except KeyError:
             print(f"Edge {edge_key} not found")
             continue
+        
         except NameError:
             import pandas as pd  # Ensure pandas is imported if not already
             road_name = edge_gdf.get('name', None)
@@ -167,7 +170,14 @@ def find_path():
                 }
             })
 
-    path_geojson = {"type": "FeatureCollection", "features": features}
+    #path_geojson = {"type": "FeatureCollection", "features": features}
+    path_geojson = {
+        "type": "FeatureCollection",
+        "features": features,
+        "properties": {
+            "total_length": total_length  # Add total length to the GeoJSON
+        }
+    }
     print(f"Returning JSON: {json.dumps(path_geojson)}")  # Debug the exact JSON string
     return jsonify(path_geojson)
 

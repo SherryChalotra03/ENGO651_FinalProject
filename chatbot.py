@@ -88,20 +88,29 @@ def format_route_response(route_geojson, start_location, end_location):
     if not route_geojson or 'features' not in route_geojson or not route_geojson['features']:
         return "I couldn't find a route between those locations. Please try different points or check if they are within Calgary."
 
-    # Extract road names from the route
-    roads = set()
+    # Extract road names and length from the route
+    roads = []
+    total_length = route_geojson.get('properties', {}).get('total_length', 0)
     for feature in route_geojson['features']:
         road_name = feature['properties'].get('name', 'Unnamed Road')
-        roads.add(road_name)
+        length = feature['properties'].get('length', 0)
+        roads.append({
+            "name": road_name,
+            "length": length
+        })
     
-    road_list = list(roads)
-    if not road_list:
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_roads = [road for road in roads if not (road['name'] in seen or seen.add(road['name']))]
+
+    if not unique_roads:
         return "I found a route, but I couldn't identify the road names."
 
     # Format the response
     response = f"Here’s your route from {start_location} to {end_location}:\n"
-    for i, road in enumerate(road_list, 1):
-        response += f"Step {i}: Travel on {road}\n"
+    for i, road in enumerate(unique_roads, 1):
+        response += f"Step {i}: Travel on {road['name']} ({(road['length'] / 1000):.2f} km)\n"
+    response += f"\nTotal Distance: {(total_length / 1000):.2f} km"
     
     return response
 
@@ -142,4 +151,4 @@ def process_chat_message(user_input, geoapify_api_key):
 
     # Step 4: Format the response
     response = format_route_response(route_geojson, start_location, end_location)
-    return {"response": response, "route_geojson": route_geojson, "start_coords": start_coords, "end_coords": end_coords}
+    return {"success": True, "response": response, "route_geojson": route_geojson, "start_coords": start_coords, "end_coords": end_coords}

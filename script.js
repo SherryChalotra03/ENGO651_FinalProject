@@ -109,6 +109,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             async function findPath() { //previous findpath() function starts from here
+                // Show loading spinner
+                document.getElementById('loadingSpinner').style.display = 'block';
                 let start = startPoint;
                 let end = endPoint;
 
@@ -246,6 +248,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.error('Pathfinding failed:', error.message);
                     info.update({ message: 'Pathfinding failed. Check console for details.' });
                     document.getElementById('routeSteps').innerHTML = '<li>Error finding route.</li>';
+                })
+
+                .finally(() => {
+                    // Hide loading spinner
+                    document.getElementById('loadingSpinner').style.display = 'none';
                 });
             } //previous findpath() function ends here
 
