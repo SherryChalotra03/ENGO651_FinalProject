@@ -129,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         console.warn('Geocoding failed for start location. Please try a more specific location.');
                         info.update({ message: 'Geocoding failed for start location. Try a more specific location (e.g., "Downtown Calgary, AB").' });
+                        document.getElementById('loadingSpinner').style.display = 'none';
                         return;
                     }
                 }
@@ -144,6 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         console.warn('Geocoding failed for end location. Please try a more specific location.');
                         info.update({ message: 'Geocoding failed for end location. Try a more specific location (e.g., "Calgary Tower, Calgary, AB").' });
+                        document.getElementById('loadingSpinner').style.display = 'none';
                         return;
                     }
                 }
@@ -218,7 +220,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         return;
                     }
                     pathLayer = L.geoJSON(pathGeojson, {
-                        style: { color: '#0000ff', weight: 2, opacity: 0.8 }
+                        style: { color: '#0000ff', weight: 2, opacity: 0.8 },
+                        onEachFeature: (feature, layer) => {
+                            layer.bindPopup(`Road: ${feature.properties.name}<br>Distance: ${(feature.properties.length / 1000).toFixed(2)} km`);
+                        }
                     }).addTo(map);
                     map.fitBounds(pathLayer.getBounds());
                     console.log('Path layer added with', pathGeojson.features.length, 'features');
@@ -226,24 +231,55 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     const routeSteps = document.getElementById('routeSteps');
                     routeSteps.innerHTML = '';
-                    const roads = new Set();
-                    pathGeojson.features.forEach((feature, index) => {
+                   // const roads = new Set();
+                    const roads = [];
+                    let totalLength = pathGeojson.properties.total_length || 0;
+                   
+                    pathGeojson.features.forEach((feature,index) => {
                         console.log(`Feature ${index}:`, feature);
                         const roadName = feature.properties && feature.properties.name ? feature.properties.name : 'Unnamed Road';
                         console.log(`Feature ${index}: roadName=${roadName}`);
-                        roads.add(roadName);
+                        const length = feature.properties.length || 0;
+                        roads.push({ name: roadName, length });
+                        //roads.add(roadName);
                     });
-                    const roadList = Array.from(roads);
-                    if (roadList.length === 0) {
+                    // const roadList = Array.from(roads);   //previous code
+                    // if (roadList.length === 0) {
+                    //     routeSteps.innerHTML = '<li>No roads identified.</li>';
+                    // } else {
+                    //     roadList.forEach((road, index) => {
+                    //         const li = document.createElement('li');
+                    //         li.textContent = `Step ${index + 1}: Travel on ${road}`;
+                    //         routeSteps.appendChild(li);
+                    //     });
+                    //}
+
+
+                    //adding new here for distance
+                    // Remove duplicates while preserving order
+                    const seen = new Set();
+                    const uniqueRoads = roads.filter(road => {
+                        if (seen.has(road.name)) return false;
+                        seen.add(road.name);
+                        return true;
+                    });
+                    if (uniqueRoads.length === 0) {
                         routeSteps.innerHTML = '<li>No roads identified.</li>';
                     } else {
-                        roadList.forEach((road, index) => {
+                        uniqueRoads.forEach((road, index) => {
                             const li = document.createElement('li');
-                            li.textContent = `Step ${index + 1}: Travel on ${road}`;
+                            li.innerHTML = `Step ${index + 1}: Travel on ${road.name} (${(road.length / 1000).toFixed(2)} km)`;
                             routeSteps.appendChild(li);
                         });
+
+                        // Add total distance
+                        const totalLi = document.createElement('li');
+                        totalLi.innerHTML = `<b>Total Distance: ${(totalLength / 1000).toFixed(2)} km</b>`;
+                        routeSteps.appendChild(totalLi);
                     }
                 })
+
+                
                 .catch(error => {
                     console.error('Pathfinding failed:', error.message);
                     info.update({ message: 'Pathfinding failed. Check console for details.' });
@@ -284,6 +320,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('startLon').value = '';
                 document.getElementById('endLat').value = '';
                 document.getElementById('endLon').value = '';
+                document.getElementById('routeSteps').innerHTML = ''; // Clear the route plan pane
                 map.setView([51.0447, -114.0719], 11);
                 info.update({ message: 'Map reset. Click to set new points or enter locations.' });
             });
@@ -313,6 +350,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('startLon').value = '';
                     document.getElementById('endLat').value = '';
                     document.getElementById('endLon').value = '';
+                    document.getElementById('routeSteps').innerHTML = ''; // Clear the route plan pane
                     map.setView([51.0447, -114.0719], 11);
                     info.update({ message: 'Map reset. Click to set new points or enter locations.' });
                 }
@@ -343,7 +381,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 messageDiv.className = `chat-message ${sender}`;
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'message-content';
-                contentDiv.textContent = message;
+                //contentDiv.textContent = message;
+                contentDiv.innerHTML = message; // Use innerHTML to render HTML content instead of textContent
                 messageDiv.appendChild(contentDiv);
                 chatBody.appendChild(messageDiv);
                 chatBody.scrollTop = chatBody.scrollHeight;
@@ -357,6 +396,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 addChatMessage(message, 'user');
                 chatInput.value = '';
 
+                // Show loading spinner
+                document.getElementById('loadingSpinner').style.display = 'block';
+
                 // Send message to backend
                 fetch('http://localhost:5000/chat', {
                     method: 'POST',
@@ -367,6 +409,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(data => {
                     if (data.error) {
                         addChatMessage(data.error, 'bot');
+                        info.update({ message: data.error });
                         return;
                     }
 
@@ -385,24 +428,57 @@ document.addEventListener('DOMContentLoaded', function () {
                         endMarker = L.marker(endPoint, { icon: redIcon }).addTo(map).bindPopup('End').openPopup();
 
                         pathLayer = L.geoJSON(data.route_geojson, {
-                            style: { color: '#0000ff', weight: 2, opacity: 0.8 }
+                            style: { color: '#0000ff', weight: 2, opacity: 0.8 },
+                            onEachFeature: (feature, layer) => {
+                                layer.bindPopup(`Road: ${feature.properties.name}<br>Distance: ${(feature.properties.length / 1000).toFixed(2)} km`);
+                            }
                         }).addTo(map);
                         map.fitBounds(pathLayer.getBounds());
 
                         // Update the route plan in the sidebar
                         const routeSteps = document.getElementById('routeSteps');
                         routeSteps.innerHTML = '';
-                        const roads = new Set();
+                        //const roads = new Set();
+                        const roads = [];
+                        let totalLength = data.route_geojson.properties.total_length || 0;
                         data.route_geojson.features.forEach(feature => {
                             const roadName = feature.properties && feature.properties.name ? feature.properties.name : 'Unnamed Road';
-                            roads.add(roadName);
+                            
+                            const length = feature.properties.length || 0;
+                            roads.push({ name: roadName, length });
+                            //roads.add(roadName);
                         });
-                        const roadList = Array.from(roads);
-                        roadList.forEach((road, index) => {
-                            const li = document.createElement('li');
-                            li.textContent = `Step ${index + 1}: Travel on ${road}`;
-                            routeSteps.appendChild(li);
+
+
+                        // const roadList = Array.from(roads);  //previous code starts
+                        // roadList.forEach((road, index) => {
+                        //     const li = document.createElement('li');
+                        //     li.textContent = `Step ${index + 1}: Travel on ${road}`;
+                        //     routeSteps.appendChild(li);      //previous code ends
+                        // });
+
+                        // Remove duplicates while preserving order
+                        const seen = new Set();
+                        const uniqueRoads = roads.filter(road => {
+                            if (seen.has(road.name)) return false;
+                            seen.add(road.name);
+                            return true;
                         });
+
+                        if (uniqueRoads.length === 0) {
+                            routeSteps.innerHTML = '<li>No roads identified.</li>';
+                        } else {
+                            uniqueRoads.forEach((road, index) => {
+                                const li = document.createElement('li');
+                                li.innerHTML = `Step ${index + 1}: Travel on ${road.name} (${(road.length / 1000).toFixed(2)} km)`;
+                                routeSteps.appendChild(li);
+                            });
+
+                            // Add total distance
+                            const totalLi = document.createElement('li');
+                            totalLi.innerHTML = `<b>Total Distance: ${(totalLength / 1000).toFixed(2)} km</b>`;
+                            routeSteps.appendChild(totalLi);
+                        }
 
                         info.update({ message: `Path found with ${data.route_geojson.features.length} segments.` });
                     }
@@ -410,6 +486,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 .catch(error => {
                     console.error('Chat request failed:', error);
                     addChatMessage('Sorry, something went wrong. Please try again.', 'bot');
+                    info.update({ message: 'Chat request failed. Please try again.' });
+                })
+                .finally(() => {
+                    // Hide loading spinner
+                    document.getElementById('loadingSpinner').style.display = 'none';
                 });
             });
 

@@ -73,11 +73,14 @@
 
 .chat-message .message-content {
     display: inline-block;
+    background: #e1f5fe;
+    color: #333;
     padding: 10px 15px;
     border-radius: 15px;
     max-width: 80%;
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1.5;
+    word-wrap: break-word; /* Ensure long words wrap */
 }
 
 .chat-message.user .message-content {
@@ -86,8 +89,9 @@
 }
 
 .chat-message.bot .message-content {
-    background-color: #e9ecef;
+    background-color: #e1f5fe;
     color: #333;
+    align-self: flex-start;
 }
 
 .chat-input {
@@ -133,4 +137,48 @@
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+.chat-message .message-content {
+    background: #e1f5fe;
+    color: #333;
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 80%;
+    line-height: 1.5; /* Improve line spacing */
+    word-wrap: break-word; /* Ensure long words wrap */
+}
+
+.chat-message.bot .message-content {
+    background: #e1f5fe;
+    align-self: flex-start;
+}
+
+.chat-message.user .message-content {
+    background: #4caf50;
+    color: white;
+    align-self: flex-end;
+}
+
+/* Style the list in the chat message */
+.chat-message .message-content ul {
+    padding-left: 20px;
+    margin: 5px 0;
+}
+
+.chat-message .message-content li {
+    margin-bottom: 5px;
+}
+
+/* Dark theme adjustments (if you have a dark theme) */
+body.dark-theme .chat-message.bot .message-content {
+    background: #0288d1;
+    color: #e0e0e0;
+}
+
+body.dark-theme .chat-message.user .message-content {
+    background: #388e3c;
+    color: #e0e0e0;
 }

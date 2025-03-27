@@ -83,7 +83,7 @@ def find_route(start_coords, end_coords):
 def format_route_response(route_geojson, start_location, end_location):
     """
     Format the route GeoJSON into a conversational response.
-    Returns a string with the route plan.
+    Returns a string with the route plan , formatted as an HTML list.
     """
     if not route_geojson or 'features' not in route_geojson or not route_geojson['features']:
         return "I couldn't find a route between those locations. Please try different points or check if they are within Calgary."
@@ -109,8 +109,8 @@ def format_route_response(route_geojson, start_location, end_location):
     # Format the response
     response = f"Here’s your route from {start_location} to {end_location}:\n"
     for i, road in enumerate(unique_roads, 1):
-        response += f"Step {i}: Travel on {road['name']} ({(road['length'] / 1000):.2f} km)\n"
-    response += f"\nTotal Distance: {(total_length / 1000):.2f} km"
+        response += f"<li>Step {i}: Travel on {road['name']} ({(road['length'] / 1000):.2f} km)</li>"
+    response += f"</ul><br><b>Total Distance: {(total_length / 1000):.2f} km</b>"
     
     return response
 
@@ -121,7 +121,7 @@ def process_chat_message(user_input, geoapify_api_key):
     # Step 1: Parse the user input
     start_location, end_location = parse_user_input(user_input)
     if not start_location or not end_location:
-        return "I couldn't understand your request. Please use a format like 'Find a route from Calgary Tower to 154 SE Rosebrook Rise, Calgary'."
+        return "I couldn't understand your request. Please use a format like 'Find a route from Calgary Tower to University Station, Calgary'."
 
     # Step 2: Geocode the locations
     # Append ", Calgary, AB" if "Calgary" is not in the location name
