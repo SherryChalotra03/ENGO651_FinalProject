@@ -80,6 +80,18 @@ def find_route(start_coords, end_coords):
         print(f"Pathfinding failed: {str(e)}")
         return None
 
+def format_travel_time(seconds):
+    """
+    Format travel time from seconds to a human-readable string (e.g., '15 min 30 sec').
+    """
+    if not seconds or seconds == 0:
+        return "0 sec"
+    minutes = int(seconds // 60)
+    remaining_seconds = round(seconds % 60)
+    if minutes == 0:
+        return f"{remaining_seconds} sec"
+    return f"{minutes} min {remaining_seconds} sec"
+
 def format_route_response(route_geojson, start_location, end_location):
     """
     Format the route GeoJSON into a conversational response.
@@ -88,12 +100,17 @@ def format_route_response(route_geojson, start_location, end_location):
     if not route_geojson or 'features' not in route_geojson or not route_geojson['features']:
         return "I couldn't find a route between those locations. Please try different points or check if they are within Calgary."
 
-    # Extract road names and length from the route
+    # Extract road names and length from the route- Create GeoJSON feature
     roads = []
     total_length = route_geojson.get('properties', {}).get('total_length', 0)
+    total_travel_time = 0  # Initialize total travel time
+    
+    
     for feature in route_geojson['features']:
         road_name = feature['properties'].get('name', 'Unnamed Road')
         length = feature['properties'].get('length', 0)
+        travel_time = feature['properties'].get('travel_time', 0)  # Get travel time
+        total_travel_time += travel_time # Accumulate total travel time
         roads.append({
             "name": road_name,
             "length": length
@@ -106,11 +123,11 @@ def format_route_response(route_geojson, start_location, end_location):
     if not unique_roads:
         return "I found a route, but I couldn't identify the road names."
 
-    # Format the response
+    # Format the response as an HTML list
     response = f"Here’s your route from {start_location} to {end_location}:\n"
     for i, road in enumerate(unique_roads, 1):
         response += f"<li>Step {i}: Travel on {road['name']} ({(road['length'] / 1000):.2f} km)</li>"
-    response += f"</ul><br><b>Total Distance: {(total_length / 1000):.2f} km</b>"
+    response += f"</ul><br><b>Total Distance: {(total_length / 1000):.2f} km<br>Total Travel Time: {format_travel_time(total_travel_time)}</b>"
     
     return response
 

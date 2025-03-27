@@ -1,3 +1,12 @@
+// Helper function to format time from seconds to "X min Y sec"
+function formatTravelTime(seconds) {
+    if (!seconds || isNaN(seconds)) return "0 sec";
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.round(seconds % 60);
+    if (minutes === 0) return `${remainingSeconds} sec`;
+    return `${minutes} min ${remainingSeconds} sec`;
+}
+
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
     // Fetch the config from the backend
@@ -219,12 +228,27 @@ document.addEventListener('DOMContentLoaded', function () {
                         document.getElementById('routeSteps').innerHTML = '<li>No route found.</li>';
                         return;
                     }
+                    console.log('Path GeoJSON:', JSON.stringify(pathGeojson, null, 2)); // Log the GeoJSON structure
+
+                    
                     pathLayer = L.geoJSON(pathGeojson, {
                         style: { color: '#0000ff', weight: 2, opacity: 0.8 },
+                        // onEachFeature: (feature, layer) => {
+                        //     layer.bindPopup(`Road: ${feature.properties.name}<br>Distance: ${(feature.properties.length / 1000).toFixed(2)} km`);
+                        // }
                         onEachFeature: (feature, layer) => {
-                            layer.bindPopup(`Road: ${feature.properties.name}<br>Distance: ${(feature.properties.length / 1000).toFixed(2)} km`);
-                        }
+                            console.log('Feature properties:', feature.properties);
+                            const travelTime = feature.properties.travel_time || 0;
+                            console.log('Travel time for feature:', travelTime);
+
+                        layer.bindPopup(
+                            `Road: ${feature.properties.name || 'Unnamed Road'} ` +
+                            `<br>Distance: ${(feature.properties.length / 1000).toFixed(2)} km` +
+                            `<br>Travel Time: ${formatTravelTime(travelTime)}`
+                        );
+                    }
                     }).addTo(map);
+                    
                     map.fitBounds(pathLayer.getBounds());
                     console.log('Path layer added with', pathGeojson.features.length, 'features');
                     info.update({ message: `Path found with ${pathGeojson.features.length} segments.` });
@@ -234,12 +258,21 @@ document.addEventListener('DOMContentLoaded', function () {
                    // const roads = new Set();
                     const roads = [];
                     let totalLength = pathGeojson.properties.total_length || 0;
-                   
+                 //   let totalTravelTime = 0; // Initialize total travel time
+
+                    let totalTravelTime = pathGeojson.properties.total_travel_time || 0;
+                    if (!pathGeojson.properties.total_travel_time) {
+                        pathGeojson.features.forEach((feature) => {
+                            totalTravelTime += feature.properties.travel_time || 0;
+                        });
+                            
                     pathGeojson.features.forEach((feature,index) => {
                         console.log(`Feature ${index}:`, feature);
                         const roadName = feature.properties && feature.properties.name ? feature.properties.name : 'Unnamed Road';
                         console.log(`Feature ${index}: roadName=${roadName}`);
                         const length = feature.properties.length || 0;
+                       // const travelTime = feature.properties.travel_time || 0; // Get travel time for this segment (from d22-travel_time)
+                       // totalTravelTime += travelTime; // Add to total travel time
                         roads.push({ name: roadName, length });
                         //roads.add(roadName);
                     });
@@ -272,13 +305,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             routeSteps.appendChild(li);
                         });
 
-                        // Add total distance
+                        // Add total distance and travel time
                         const totalLi = document.createElement('li');
-                        totalLi.innerHTML = `<b>Total Distance: ${(totalLength / 1000).toFixed(2)} km</b>`;
+                        totalLi.innerHTML = `<b>Total Distance: ${(totalLength / 1000).toFixed(2)} km<br>Total Travel Time: ${formatTravelTime(totalTravelTime)}</b>`;
                         routeSteps.appendChild(totalLi);
                     }
+                }
                 })
-
+           
                 
                 .catch(error => {
                     console.error('Pathfinding failed:', error.message);
@@ -369,6 +403,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             info.addTo(map);
 
+
+            // chatbot logic
             const chatContainer = document.getElementById('chatContainer');
             const chatBody = document.getElementById('chatBody');
             const chatInput = document.getElementById('chatInput');
@@ -405,8 +441,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: message })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Chat response status:', response.status);
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    return response.json();
+                })
+
                 .then(data => {
+                    console.log('Chat response data:', data);
                     if (data.error) {
                         addChatMessage(data.error, 'bot');
                         info.update({ message: data.error });
@@ -430,22 +472,41 @@ document.addEventListener('DOMContentLoaded', function () {
                         pathLayer = L.geoJSON(data.route_geojson, {
                             style: { color: '#0000ff', weight: 2, opacity: 0.8 },
                             onEachFeature: (feature, layer) => {
-                                layer.bindPopup(`Road: ${feature.properties.name}<br>Distance: ${(feature.properties.length / 1000).toFixed(2)} km`);
+                                console.log('Feature properties:', feature.properties); // Log the properties to debug
+                                const travelTime = feature.properties.travel_time || 0; // Ensure travelTime is defined
+                                console.log('Travel time for feature:', travelTime); // Log the travelTime value
+                                // layer.bindPopup(`Road: ${feature.properties.name}<br>Distance: ${(feature.properties.length / 1000).toFixed(2)} km<br>Travel Time: ${formatTravelTime(travelTime)}`);
+                                layer.bindPopup(
+                                    `Road: ${feature.properties.name || 'Unnamed Road'} ` +
+                                    `<br>Distance: ${(feature.properties.length / 1000).toFixed(2)} km` +
+                                    `<br>Travel Time: ${formatTravelTime(travelTime)}`
+                                );
                             }
                         }).addTo(map);
                         map.fitBounds(pathLayer.getBounds());
 
                         // Update the route plan in the sidebar
                         const routeSteps = document.getElementById('routeSteps');
+                        if (!routeSteps) throw new Error('routeSteps element not found in the DOM');
                         routeSteps.innerHTML = '';
                         //const roads = new Set();
                         const roads = [];
                         let totalLength = data.route_geojson.properties.total_length || 0;
+                        //let totalTravelTime = 0; // Initialize total travel time
+                        let totalTravelTime = data.route_geojson.properties.total_travel_time || 0;
+                        if (!data.route_geojson.properties.total_travel_time) {
+                            data.route_geojson.features.forEach(feature => {
+                                totalTravelTime += feature.properties.travel_time || 0;
+                            });
+                        }
+
+
                         data.route_geojson.features.forEach(feature => {
                             const roadName = feature.properties && feature.properties.name ? feature.properties.name : 'Unnamed Road';
-                            
                             const length = feature.properties.length || 0;
+                            //const travelTime = feature.properties.travel_time || 0; // Get travel time for this segment (from d22)
                             roads.push({ name: roadName, length });
+                            //totalTravelTime += travelTime; // Add to total travel time
                             //roads.add(roadName);
                         });
 
@@ -476,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             // Add total distance
                             const totalLi = document.createElement('li');
-                            totalLi.innerHTML = `<b>Total Distance: ${(totalLength / 1000).toFixed(2)} km</b>`;
+                            totalLi.innerHTML = `<b>Total Distance: ${(totalLength / 1000).toFixed(2)} km<br>Total Travel Time: ${formatTravelTime(totalTravelTime)}</b>`;
                             routeSteps.appendChild(totalLi);
                         }
 

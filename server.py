@@ -112,10 +112,11 @@ def find_path():
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
     features = []
-   # total_travel_time = 0  # In seconds
+    total_travel_time = 0  # In seconds
     total_length = 0  # In meters
     for u, v in zip(path[:-1], path[1:]):
         try:
+            # Get edge data from the GraphML graph
             edge_data = G.get_edge_data(u, v)[0]
             edge_key = (u, v, 0)
             edge_gdf = edges.loc[edge_key]
@@ -131,8 +132,8 @@ def find_path():
                 road_name = edge_gdf.get('highway', 'Unnamed Road').capitalize()
                 
             # Accumulate travel time and distance
-           # travel_time = edge_data.get('travel_time', 0)
-            #total_travel_time += travel_time
+            travel_time = edge_data.get('travel_time', 0)
+            total_travel_time += travel_time
             total_length += edge_data.get('length', 0)
                
             print(f"Edge {edge_key}: name={road_name}")
@@ -143,7 +144,8 @@ def find_path():
                     "osmid": edge_gdf['osmid'],
                     "name": road_name if not pd.isna(road_name) else 'Unnamed Road',  # Nest name under properties
                     # Add other properties as needed (e.g., highway, length)
-                    "length": edge_data.get('length', None)
+                    "length": edge_data.get('length', None),
+                    "travel_time": edge_data.get('travel_time', None)
                     
                 }
             })
@@ -175,7 +177,8 @@ def find_path():
         "type": "FeatureCollection",
         "features": features,
         "properties": {
-            "total_length": total_length  # Add total length to the GeoJSON
+            "total_length": total_length,  # Add total length to the GeoJSON
+            "total_travel_time": total_travel_time  # Include total travel time
         }
     }
     print(f"Returning JSON: {json.dumps(path_geojson)}")  # Debug the exact JSON string
