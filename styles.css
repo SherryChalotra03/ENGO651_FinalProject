@@ -9,23 +9,75 @@ body {
 /* Header Styles */
 .app-header {
     background: linear-gradient(135deg, #2c3e50, #3498db);
+    /* background: linear-gradient(135deg, #1e40af, #3b82f6); */
     color: white;
     text-align: center;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+    padding: 25px 40px; /* Increased padding for a more spacious look */
+    border-bottom: 4px solid #60a5fa; /* Subtle border with a lighter blue */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Deeper shadow for a 3D effect */
+    display: flex; /* Keep flex for layout with instructions */
+    justify-content: space-between;
+    align-items: center;
+    position: relative; /* For potential pseudo-elements or overlays */
+    overflow: hidden; /* Ensure any pseudo-elements don’t overflow */
 }
 
 .app-header h1 {
     margin: 0;
-    font-size: 32px;
-    font-weight: 700;
+    font-size: 30px;
+    font-weight: 800;
+    /* text-align: left; */
+    /* font-family: 'Poppins', sans-serif; Modern, bold font for the title */
+    font-family: 'Montserrat', sans-serif; /* Modern, geometric font */
+    letter-spacing: 1.5px; /* Slight letter spacing for elegance */
+    color: #f8fafc; /* Bright white for better contrast against the gradient */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Deeper shadow for depth */
+    transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease; /* Smooth hover animation */
+}
+.app-header h1:hover {
+    
+    transform: scale(1.05); /* Slight scale-up on hover for a dynamic effect */
+    color: #e0f2fe; /* Lighter blue on hover */
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4); /* Enhanced shadow on hover */
 }
 
 .app-header p {
-    margin: 5px 0 0;
-    font-size: 16px;
+    margin: 8px 0 0;
+    font-size: 18px;
     font-weight: 300;
+    /* text-align: left; */
     opacity: 0.9;
+    /* font-family: 'Roboto', sans-serif; Clean, modern font for the subtitle */
+    font-family: 'Open Sans', sans-serif; /* Clean, modern font */
+    color: #bfdbfe; /* Softer blue for a cohesive look */
+    letter-spacing: 0.5px; /* Slight letter spacing for readability */
+    transition: opacity 0.3s ease; /* Smooth opacity transition on hover */
+    opacity: 0.9; /* Keep the original opacity */
+}
+
+.app-header p:hover {
+    opacity: 1; /* Full opacity on hover for emphasis */
+    color: #e0f2fe; /* Lighter blue on hover */
+}
+
+/* Add a subtle overlay effect for depth */
+.app-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.1); /* Slight dark overlay for depth */
+    z-index: 1;
+}
+
+/* Ensure content is above the overlay */
+.app-header > * {
+    position: relative;
+    z-index: 2;
 }
 
 /* Container */
@@ -277,3 +329,5 @@ body {
     color: #2c3e50;
     font-size: 18px;
 }
+
+
