@@ -77,8 +77,8 @@ def geocode():
 def find_path():
      
     data = request.get_json()
-    start_lat, start_lon = data['start']
-    end_lat, end_lon = data['end']
+    start_lat, start_lon = data['start'] # [lat, lon]
+    end_lat, end_lon = data['end']       # [lat, lon]
     print(f"Received: start={start_lat},{start_lon}, end={end_lat},{end_lon}")
  
      # Validate coordinates are within Calgary bounds (approx)
@@ -90,6 +90,7 @@ def find_path():
             calgary_bounds['min_lon'] <= start_lon <= calgary_bounds['max_lon']):
         print("Start point is outside Calgary bounds")
         return jsonify({"error": "Start point is outside Calgary bounds"}), 400
+    
     if not (calgary_bounds['min_lat'] <= end_lat <= calgary_bounds['max_lat'] and
              calgary_bounds['min_lon'] <= end_lon <= calgary_bounds['max_lon']):
         print("End point is outside Calgary bounds")
@@ -103,6 +104,8 @@ def find_path():
         print("One or both nodes are not in the Calgary road network")
         return jsonify({"error": "One or both points are outside the Calgary road network"}), 400
 
+
+    # Find the shortest path using Dijkstra's algorithm
     try:
         path = nx.shortest_path(G, start_node, end_node, weight='length')
         #path = nx.shortest_path(G, start_node, end_node, weight='travel_time')
@@ -111,6 +114,7 @@ def find_path():
         print(f"Unexpected pathfinding error: {str(e)}")
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
+    # Construct GeoJSON for the path
     features = []
     total_travel_time = 0  # In seconds
     total_length = 0  # In meters

@@ -1,9 +1,19 @@
 // Helper function to format time from seconds to "X min Y sec"
 function formatTravelTime(seconds) {
-    if (!seconds || isNaN(seconds)) return "0 sec";
+    // Handle null, undefined, or non-numeric values
+    if (seconds == null || isNaN(seconds)) {
+        console.warn('Invalid travel time:', seconds);
+        return "0 sec";
+    }
+    seconds = Number(seconds);
+    if (seconds === 0) {
+        return "0 sec";
+    }
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.round(seconds % 60);
-    if (minutes === 0) return `${remainingSeconds} sec`;
+    if (minutes === 0) {
+        return `${remainingSeconds} sec`;
+    }
     return `${minutes} min ${remainingSeconds} sec`;
 }
 
@@ -126,6 +136,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 const startLocation = document.getElementById('startLocation').value.trim();
                 const endLocation = document.getElementById('endLocation').value.trim();
 
+                console.log('Start location input:', startLocation);
+                console.log('End location input:', endLocation);
+
                 if (startLocation && !start) {
                     const adjustedStartLocation = startLocation.toLowerCase().includes('calgary') ? startLocation : `${startLocation}, Calgary, AB`;
                     start = await geocodeLocation(adjustedStartLocation);
@@ -135,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         startPoint = start;
                         document.getElementById('startLat').value = start[0];
                         document.getElementById('startLon').value = start[1];
+                        console.log('Geocoded start location:', start);
                     } else {
                         console.warn('Geocoding failed for start location. Please try a more specific location.');
                         info.update({ message: 'Geocoding failed for start location. Try a more specific location (e.g., "Downtown Calgary, AB").' });
@@ -151,6 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         endPoint = end;
                         document.getElementById('endLat').value = end[0];
                         document.getElementById('endLon').value = end[1];
+                        console.log('Geocoded end location:', end);
                     } else {
                         console.warn('Geocoding failed for end location. Please try a more specific location.');
                         info.update({ message: 'Geocoding failed for end location. Try a more specific location (e.g., "Calgary Tower, Calgary, AB").' });
@@ -167,6 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (startMarker) map.removeLayer(startMarker);
                         startMarker = L.marker(start, { icon: greenIcon }).addTo(map).bindPopup('Start').openPopup();
                         startPoint = start;
+                        console.log('Start coordinates from textboxes:', start);
                     }
                 }
                 if (!end) {
@@ -177,12 +193,43 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (endMarker) map.removeLayer(endMarker);
                         endMarker = L.marker(end, { icon: redIcon }).addTo(map).bindPopup('End').openPopup();
                         endPoint = end;
+                        console.log('End coordinates from textboxes:', end);
                     }
                 }
 
                 if (!start || !end) {
                     console.warn('Invalid start or end point. Please provide valid locations or coordinates.');
                     info.update({ message: 'Invalid start or end point. Please provide valid locations or coordinates.' });
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    return;
+                }
+
+                // Validate coordinates are within Calgary bounds
+                const calgaryBounds = {
+                    minLat: 50.842,
+                    maxLat: 51.212,
+                    minLon: -114.315,
+                    maxLon: -113.860
+                };
+
+                const [startLat, startLon] = start;
+                const [endLat, endLon] = end;
+
+                if (!(calgaryBounds.minLat <= startLat && startLat <= calgaryBounds.maxLat &&
+                    calgaryBounds.minLon <= startLon && startLon <= calgaryBounds.maxLon)) {
+                    console.warn('Start point is outside Calgary bounds:', start);
+                    info.update({ message: 'Start point is outside Calgary bounds.' });
+                    document.getElementById('routeSteps').innerHTML = '<li>Start point is outside Calgary bounds.</li>';
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    return;
+                }
+
+                if (!(calgaryBounds.minLat <= endLat && endLat <= calgaryBounds.maxLat &&
+                    calgaryBounds.minLon <= endLon && endLon <= calgaryBounds.maxLon)) {
+                    console.warn('End point is outside Calgary bounds:', end);
+                    info.update({ message: 'End point is outside Calgary bounds.' });
+                    document.getElementById('routeSteps').innerHTML = '<li>End point is outside Calgary bounds.</li>';
+                    document.getElementById('loadingSpinner').style.display = 'none';
                     return;
                 }
 
@@ -195,40 +242,67 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(response => {
                     console.log('Fetch response status:', response.status);
                     console.log('Fetch response headers:', response.headers.get('Content-Type'));
-                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                    return response.text();
-                })
-                .then(rawText => {
-                    console.log('Raw response (as string):', rawText);
-                    try {
-                        const pathGeojson = JSON.parse(rawText);
-                        console.log('Parsed pathGeojson:', pathGeojson);
-                        return pathGeojson;
-                    } catch (e) {
-                        console.error('JSON parsing failed:', e.message, 'Raw text:', rawText);
-                        throw new Error('Invalid JSON response from server');
+                    // if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    // return response.text();
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(`HTTP error! Status: ${response.status}, Message: ${err.error || 'Unknown error'}`);
+                        });
                     }
+                    return response.json();
+
                 })
+                // .then(rawText => {
+                //     console.log('Raw response (as string):', rawText);
+                //     try {
+                //         const pathGeojson = JSON.parse(rawText);
+                //         console.log('Parsed pathGeojson:', pathGeojson);
+                //         return pathGeojson;
+                //     } catch (e) {
+                //         console.error('JSON parsing failed:', e.message, 'Raw text:', rawText);
+                //         throw new Error('Invalid JSON response from server');
+                //     }
+                // })
                 .then(pathGeojson => {
-                    console.log('Path received:', pathGeojson);
-                    if (pathGeojson.error) {
+                    console.log('Path received: (raw)', pathGeojson);
+                    // Ensure pathGeojson has the expected structure
+                    if (!pathGeojson || typeof pathGeojson !== 'object') {
+                        console.error('Invalid GeoJSON response: pathGeojson is not an object');
+                        info.update({ message: 'Invalid response from server.' });
+                        document.getElementById('routeSteps').innerHTML = '<li>Invalid response from server.</li>';
+                        return;
+                    }
+
+                    if (pathGeojson.error ) {
                         console.warn('Backend error:', pathGeojson.error);
                         info.update({ message: pathGeojson.error });
                         document.getElementById('routeSteps').innerHTML = '<li>' + pathGeojson.error + '</li>';
                         return;
                     }
-                    if (pathLayer) {
-                        map.removeLayer(pathLayer);
-                        pathLayer = null;
-                    }
 
-                    if (!pathGeojson.features || pathGeojson.features.length === 0) {
+                    // Check for features
+                    if (!pathGeojson.features || !Array.isArray(pathGeojson.features) || pathGeojson.features.length === 0) {
                         console.warn('No features in path GeoJSON or invalid response:', pathGeojson);
                         info.update({ message: 'No path found. Try different points.' });
                         document.getElementById('routeSteps').innerHTML = '<li>No route found.</li>';
                         return;
                     }
-                    console.log('Path GeoJSON:', JSON.stringify(pathGeojson, null, 2)); // Log the GeoJSON structure
+
+                    console.log('Path GeoJSON (processed):', JSON.stringify(pathGeojson, null, 2));
+
+                    try{
+                    if (pathLayer) {
+                        map.removeLayer(pathLayer);
+                        pathLayer = null;
+                    }
+
+                    // if (!pathGeojson.features || pathGeojson.features.length === 0) {
+                    //     console.warn('No features in path GeoJSON or invalid response:', pathGeojson);
+                    //     info.update({ message: 'No path found. Try different points.' });
+                    //     document.getElementById('routeSteps').innerHTML = '<li>No route found.</li>';
+                    //     return;
+                    // }
+                    // console.log('Path GeoJSON:', JSON.stringify(pathGeojson, null, 2)); // Log the GeoJSON structure
 
                     
                     pathLayer = L.geoJSON(pathGeojson, {
@@ -241,11 +315,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             const travelTime = feature.properties.travel_time || 0;
                             console.log('Travel time for feature:', travelTime);
 
-                        layer.bindPopup(
-                            `Road: ${feature.properties.name || 'Unnamed Road'} ` +
-                            `<br>Distance: ${(feature.properties.length / 1000).toFixed(2)} km` +
-                            `<br>Travel Time: ${formatTravelTime(travelTime)}`
-                        );
+                            layer.bindPopup(
+                                `Road: ${feature.properties.name || 'Unnamed Road'} ` +
+                                `<br>Distance: ${(feature.properties.length / 1000).toFixed(2)} km` +
+                                `<br>Travel Time: ${formatTravelTime(travelTime)}`
+                            );
                     }
                     }).addTo(map);
                     
@@ -253,29 +327,49 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log('Path layer added with', pathGeojson.features.length, 'features');
                     info.update({ message: `Path found with ${pathGeojson.features.length} segments.` });
 
+                    // Update the route plan in the sidebar
                     const routeSteps = document.getElementById('routeSteps');
+                    if (!routeSteps) {
+                        console.error('routeSteps element not found in the DOM');   // error check
+                        return;
+                    }
                     routeSteps.innerHTML = '';
                    // const roads = new Set();
                     const roads = [];
                     let totalLength = pathGeojson.properties.total_length || 0;
-                 //   let totalTravelTime = 0; // Initialize total travel time
-
                     let totalTravelTime = pathGeojson.properties.total_travel_time || 0;
+                    
+                    console.log('Total length from properties:', totalLength);
+                    console.log('Total travel time from properties:', totalTravelTime);
+
                     if (!pathGeojson.properties.total_travel_time) {
+                        console.log('Calculating total travel time from features');
                         pathGeojson.features.forEach((feature) => {
                             totalTravelTime += feature.properties.travel_time || 0;
+                            console.log(`Adding travel time for feature: ${travelTime}, Total now: ${totalTravelTime}`);
                         });
+                    }
                             
-                    pathGeojson.features.forEach((feature,index) => {
-                        console.log(`Feature ${index}:`, feature);
+                    // pathGeojson.features.forEach((feature,index) => {
+                    //     console.log(`Feature ${index}:`, feature);
+                    //     const roadName = feature.properties && feature.properties.name ? feature.properties.name : 'Unnamed Road';
+                    //     console.log(`Feature ${index}: roadName=${roadName}`);
+                    //     const length = feature.properties.length || 0;
+                    //     console.log(`Feature ${index}: name=${roadName}, length=${length}`);
+                    //    // const travelTime = feature.properties.travel_time || 0; // Get travel time for this segment (from d22-travel_time)
+                    //    // totalTravelTime += travelTime; // Add to total travel time
+                    //     roads.push({ name: roadName, length });
+                    //     //roads.add(roadName);
+                    // });
+
+                    pathGeojson.features.forEach((feature) => {
                         const roadName = feature.properties && feature.properties.name ? feature.properties.name : 'Unnamed Road';
-                        console.log(`Feature ${index}: roadName=${roadName}`);
                         const length = feature.properties.length || 0;
-                       // const travelTime = feature.properties.travel_time || 0; // Get travel time for this segment (from d22-travel_time)
-                       // totalTravelTime += travelTime; // Add to total travel time
                         roads.push({ name: roadName, length });
-                        //roads.add(roadName);
                     });
+
+
+                    console.log('Roads before filtering:', roads);
                     // const roadList = Array.from(roads);   //previous code
                     // if (roadList.length === 0) {
                     //     routeSteps.innerHTML = '<li>No roads identified.</li>';
@@ -289,6 +383,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                     //adding new here for distance
+
                     // Remove duplicates while preserving order
                     const seen = new Set();
                     const uniqueRoads = roads.filter(road => {
@@ -296,20 +391,38 @@ document.addEventListener('DOMContentLoaded', function () {
                         seen.add(road.name);
                         return true;
                     });
+
+                    console.log('Unique roads after filtering:', uniqueRoads);
+
                     if (uniqueRoads.length === 0) {
+                        console.warn('No unique roads identified');
                         routeSteps.innerHTML = '<li>No roads identified.</li>';
                     } else {
                         uniqueRoads.forEach((road, index) => {
                             const li = document.createElement('li');
-                            li.innerHTML = `Step ${index + 1}: Travel on ${road.name} (${(road.length / 1000).toFixed(2)} km)`;
-                            routeSteps.appendChild(li);
+                            li.innerHTML = `Step ${index + 1}: Travel on ${road.name} (${(road.length / 1000).toFixed(2)} km)`; //Route Plan steps
+                            routeSteps.appendChild(li); //It will generate a list of steps mentioning all roads to follow
+                            console.log(`Added step ${index + 1}: ${road.name} (${(road.length / 1000).toFixed(2)} km)`);
                         });
 
                         // Add total distance and travel time
                         const totalLi = document.createElement('li');
-                        totalLi.innerHTML = `<b>Total Distance: ${(totalLength / 1000).toFixed(2)} km<br>Total Travel Time: ${formatTravelTime(totalTravelTime)}</b>`;
-                        routeSteps.appendChild(totalLi);
+                        try {
+                            const formattedTravelTime = formatTravelTime(totalTravelTime);
+                            totalLi.innerHTML = `<b>Total Distance: ${(totalLength / 1000).toFixed(2)} km<br>Total Travel Time: ${formattedTravelTime}</b>`;
+                            routeSteps.appendChild(totalLi);
+                            console.log(`Added total: Distance=${(totalLength / 1000).toFixed(2)} km, Travel Time=${formattedTravelTime}`);
+                        } catch (error) {
+                            console.error('Error formatting travel time:', error);
+                            totalLi.innerHTML = `<b>Total Distance: ${(totalLength / 1000).toFixed(2)} km<br>Total Travel Time: Error</b>`;
+                            routeSteps.appendChild(totalLi);
+                        }
                     }
+                    console.log('Route plan updated in route pane');
+                }catch (error) {
+                    console.error('Error in route update block:', error);
+                    info.update({ message: `Error rendering route: ${error.message}` });
+                    document.getElementById('routeSteps').innerHTML = `<li>Error rendering route: ${error.message}</li>`;
                 }
                 })
            
@@ -443,7 +556,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(response => {
                     console.log('Chat response status:', response.status);
-                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    console.log('Chat response headers:', response.headers.get('Content-Type'));
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(`HTTP error! Status: ${response.status}, Message: ${err.error || 'Unknown error'}`);
+                        });
+                    }
                     return response.json();
                 })
 
@@ -466,6 +584,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         startPoint = data.start_coords;
                         endPoint = data.end_coords;
+                        console.log('Start coords:', startPoint, 'End coords:', endPoint);
+
                         startMarker = L.marker(startPoint, { icon: greenIcon }).addTo(map).bindPopup('Start').openPopup();
                         endMarker = L.marker(endPoint, { icon: redIcon }).addTo(map).bindPopup('End').openPopup();
 
@@ -494,21 +614,27 @@ document.addEventListener('DOMContentLoaded', function () {
                         let totalLength = data.route_geojson.properties.total_length || 0;
                         //let totalTravelTime = 0; // Initialize total travel time
                         let totalTravelTime = data.route_geojson.properties.total_travel_time || 0;
+
+                        console.log('Total length from properties:', totalLength);
+                        console.log('Total travel time from properties:', totalTravelTime);
+
                         if (!data.route_geojson.properties.total_travel_time) {
+                            console.log('Calculating total travel time from features');
                             data.route_geojson.features.forEach(feature => {
                                 totalTravelTime += feature.properties.travel_time || 0;
+                                console.log(`Adding travel time for feature: ${travelTime}, Total now: ${totalTravelTime}`);
                             });
                         }
 
 
-                        data.route_geojson.features.forEach(feature => {
+                        data.route_geojson.features.forEach((feature, index) => {
                             const roadName = feature.properties && feature.properties.name ? feature.properties.name : 'Unnamed Road';
                             const length = feature.properties.length || 0;
-                            //const travelTime = feature.properties.travel_time || 0; // Get travel time for this segment (from d22)
+                            console.log(`Feature ${index}: name=${roadName}, length=${length}`);
                             roads.push({ name: roadName, length });
-                            //totalTravelTime += travelTime; // Add to total travel time
-                            //roads.add(roadName);
                         });
+        
+                        console.log('Roads before filtering:', roads);
 
 
                         // const roadList = Array.from(roads);  //previous code starts
@@ -525,14 +651,17 @@ document.addEventListener('DOMContentLoaded', function () {
                             seen.add(road.name);
                             return true;
                         });
+                        console.log('Unique roads after filtering:', uniqueRoads);
 
                         if (uniqueRoads.length === 0) {
+                            console.warn('No unique roads identified');
                             routeSteps.innerHTML = '<li>No roads identified.</li>';
                         } else {
                             uniqueRoads.forEach((road, index) => {
                                 const li = document.createElement('li');
                                 li.innerHTML = `Step ${index + 1}: Travel on ${road.name} (${(road.length / 1000).toFixed(2)} km)`;
                                 routeSteps.appendChild(li);
+                                console.log(`Added step ${index + 1}: ${road.name} (${(road.length / 1000).toFixed(2)} km)`);
                             });
 
                             // Add total distance
