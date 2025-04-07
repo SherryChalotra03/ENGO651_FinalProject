@@ -1,7 +1,7 @@
 # ENGO651_FinalProject: Calgary Safe Way - Intelligent Route Planning
 
 ## Overview: 
-Calgary Safe Way is an intelligent route planning application designed for the city of Calgary, Alberta, Canada. It helps users find the safest and most efficient driving routes by considering road risk levels and historical accident data. The application features a web-based interface with a Leaflet map, a chatbot for natural language route requests, and a backend powered by Flask and NetworkX for pathfinding. Road segments and accidents are visualized using custom tilesets created in Mapbox Studio.
+Calgary Safe Way is an intelligent route planning application designed for the city of Calgary, Alberta, Canada. It helps users find the safest and most efficient driving routes by considering road risk levels and historical accident data. The application features a web-based interface with a Leaflet map, a chatbot for natural language route requests, and a backend powered by Flask and NetworkX for pathfinding. It also integrates IoT functionality using MQTT to retrieve the user’s current location in real-time, automatically setting it as the starting point for route planning. Road segments and accidents are visualized using custom tilesets created in Mapbox Studio.
 
 ## Project Structure
 
