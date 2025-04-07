@@ -132,7 +132,7 @@ The server will run on http://localhost:5000. You should see Road network loaded
 ### 8. Custom Visualization with Mapbox Studio
 - **Road Risk Visualization:** Road segments are styled based on the risk_category property from road_risk_layer_categorized.shp.
 - **Example styling:**
-   ![image](https://github.com/user-attachments/assets/0eb0d0f9-359e-4410-afc8-9514c1c7e825)
+- ![image](https://github.com/user-attachments/assets/0eb0d0f9-359e-4410-afc8-9514c1c7e825)
 
 - **Mapbox Studio Integration:**
     - Styled in Mapbox Studio and integrated into Leaflet via a custom Mapbox style URL.
@@ -200,20 +200,20 @@ While not currently implemented, the following features could be added to enhanc
 
 ## Application in Action: Screenshots
 - **Application Interface**
-  ![image](https://github.com/user-attachments/assets/14d3b8af-9fcb-4e40-85b3-d984f2b567f8)
+- ![image](https://github.com/user-attachments/assets/14d3b8af-9fcb-4e40-85b3-d984f2b567f8)
 
 - **Map Interface with Route Display**
 
 - **Route Planner Pane**
-  ![image](https://github.com/user-attachments/assets/8f14a9c0-7082-453e-80a7-70f998420363)
+- ![image](https://github.com/user-attachments/assets/8f14a9c0-7082-453e-80a7-70f998420363)
 
 - **Chatbot Interaction**
-  ![image](https://github.com/user-attachments/assets/682c80d7-6992-4a13-9ce0-a2c8b6566d99)
+- ![image](https://github.com/user-attachments/assets/682c80d7-6992-4a13-9ce0-a2c8b6566d99)
 
 - **IoT Location Tracking**
 
 - **Risk Visualization on Map**
-  ![image](https://github.com/user-attachments/assets/ecb37847-b791-4574-9041-5fab3ea1b13a)
+- ![image](https://github.com/user-attachments/assets/ecb37847-b791-4574-9041-5fab3ea1b13a)
 
 ## Contributors
 - Hafsa Irfan, M.Sc
