@@ -129,3 +129,64 @@ The server will run on http://localhost:5000. You should see Road network loaded
 
 **Mapbox Studio Integration:**
     - Styled in Mapbox Studio and integrated into Leaflet via a custom Mapbox style URL.
+
+### 8. User Interface Enhancements**
+**Loading Spinner:** Displays a loading spinner while the route is being calculated or data is being fetched.
+**Reset Functionality:**
+    - Reset the map by clicking the "Reset" button or pressing the R key.
+    - Clears markers, route, and input fields, and resets the map view to the default position.
+**Responsive Design:**
+    - Sidebar for route planning and route plan display.
+    - Chatbot window positioned in the bottom-right corner with a toggle to minimize/maximize.
+**Instructions:** Provides clear instructions on how to use the application (via the map interface).
+
+### 9.Backend Features
+- **Flask Server:**
+    - Handles API requests for pathfinding (/find_path), geocoding (/geocode), chatbot interactions (/chat), and configuration (/config).
+    - Uses Flask-CORS to allow cross-origin requests from the frontend.
+- **Dynamic Risk Adjustment:**
+    - Adjusts risk scores based on time, day, and season using configurable factors.
+    - Caps adjusted risk scores to prevent extreme values.
+- **GeoJSON Output:**
+    - Returns route data as GeoJSON, including road names, distances, travel times, and risk categories.
+    - Includes total distance, total travel time, total risk, and risk category counts in the response.
+
+### 10. Error Handling and Validation
+- **Input Validation:**
+    - Ensures start and end points are within Calgary bounds.
+    - Validates that geocoded locations are valid and within the road network.
+- **Error Messages:**
+    - Displays user-friendly error messages in the UI (e.g., "Start point is outside Calgary bounds").
+    - Logs detailed errors in the console for debugging.
+- **Backend Error Handling:**
+    - Handles exceptions in pathfinding, geocoding, and file loading.
+    - Returns appropriate HTTP status codes and error messages (e.g., 400 for invalid input, 500 for server errors).
+
+### 11. Performance Optimizations
+- **Precomputed Graph:** Uses a precomputed NetworkX graph (road_network_processed.pkl) to speed up pathfinding.
+- **Efficient Geocoding:** Limits Geoapify API requests to one result per query (limit=1) to reduce latency.
+- **Mapbox Vector Tiles:** Leverages Mapbox Studio’s vector tiles for efficient rendering of large datasets (road segments and accidents).
+
+### 12. Extensibility
+- **Modular Code Structure:**
+    - Pathfinding logic is separated into find_path.py.
+    - Chatbot logic is separated into chatbot.py.
+    - Frontend logic is modularized in script.js.
+**Configurable Parameters:**
+    - Pathfinding weights (alpha for distance, beta for risk) can be adjusted.
+    - Risk adjustment factors (rush_hour_factor, weekday_factor, winter_factor) are configurable.
+**Customizable Visualization:**
+    - Mapbox Studio allows easy updates to the styling of road segments and accidents.
+    - Additional data layers can be added by uploading new tilesets to Mapbox Studio.
+### 13. Security and Configuration
+- **Environment Variables:** Stores sensitive API keys (Mapbox, Geoapify) in a .env file using python-dotenv.
+- **CORS Configuration:** Allows cross-origin requests from the frontend (http://localhost:8000) to the backend (http://localhost:5000).
+
+## Potential Future Features
+While not currently implemented, the following features could be added to enhance the project:
+- **Real-Time Traffic and Weather Data:** Integrate live traffic data to adjust travel times and risk scores dynamically.
+- **Alternate Routes:** Provide multiple route options with different risk/distance trade-offs.
+- **User Preferences:** Allow users to prioritize safety, speed, or a balance of both in route planning.
+- **Advanced Chatbot Capabilities:** Improve natural language understanding with NLP libraries (e.g., spaCy, Rasa).
+- **Mobile Responsiveness:** Optimize the UI for mobile devices.
+- **Incident Reporting:** Allow users to report new accidents or road hazards, updating the dataset in real-time.
