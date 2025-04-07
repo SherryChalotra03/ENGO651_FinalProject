@@ -132,7 +132,7 @@ The server will run on http://localhost:5000. You should see Road network loaded
 ### 8. Custom Visualization with Mapbox Studio
 - **Road Risk Visualization:** Road segments are styled based on the risk_category property from road_risk_layer_categorized.shp.
 - **Example styling:**
--  ![image](https://github.com/user-attachments/assets/0eb0d0f9-359e-4410-afc8-9514c1c7e825)
+   ![image](https://github.com/user-attachments/assets/0eb0d0f9-359e-4410-afc8-9514c1c7e825)
 
 - **Mapbox Studio Integration:**
     - Styled in Mapbox Studio and integrated into Leaflet via a custom Mapbox style URL.
@@ -200,7 +200,7 @@ While not currently implemented, the following features could be added to enhanc
 
 ## Application in Action: Screenshots
 - **Application Interface**
-![image](https://github.com/user-attachments/assets/14d3b8af-9fcb-4e40-85b3-d984f2b567f8)
+  ![image](https://github.com/user-attachments/assets/14d3b8af-9fcb-4e40-85b3-d984f2b567f8)
 
 - **Map Interface with Route Display**
 
