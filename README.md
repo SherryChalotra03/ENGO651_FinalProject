@@ -222,4 +222,4 @@ While not currently implemented, the following features could be added to enhanc
 ## Contributors
 - Hafsa Irfan, M.Sc
 - Sherry Chalotra, PhD Geomatics Engineering
-- Zahra Indrageni - PhD Geomatics Engineering
+- Zahra Irandegani - PhD Geomatics Engineering
