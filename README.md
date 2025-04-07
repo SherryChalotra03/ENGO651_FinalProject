@@ -199,16 +199,21 @@ While not currently implemented, the following features could be added to enhanc
 - **Incident Reporting:** Allow users to report new accidents or road hazards, updating the dataset in real-time.
 
 ## Application in Action: Screenshots
+- **Application Interface**
+![image](https://github.com/user-attachments/assets/14d3b8af-9fcb-4e40-85b3-d984f2b567f8)
+
 - **Map Interface with Route Display**
 
 - **Route Planner Pane**
+  ![image](https://github.com/user-attachments/assets/8f14a9c0-7082-453e-80a7-70f998420363)
 
 - **Chatbot Interaction**
+  ![image](https://github.com/user-attachments/assets/682c80d7-6992-4a13-9ce0-a2c8b6566d99)
 
 - **IoT Location Tracking**
 
 - **Risk Visualization on Map**
-
+  ![image](https://github.com/user-attachments/assets/ecb37847-b791-4574-9041-5fab3ea1b13a)
 
 ## Contributors
 - Hafsa Irfan, M.Sc
