@@ -73,7 +73,7 @@ The server will run on http://localhost:5000. You should see Road network loaded
 - **Customizable Cost Function:** Allows tuning the balance between distance (alpha) and risk (beta) in the pathfinding algorithm.
 **Precomputed Road Network:** Uses a precomputed NetworkX graph (road_network_processed.pkl) for efficient pathfinding in Calgary.
 
-### 2. 2. Interactive Map Interface
+### 2. Interactive Map Interface
 
 - **Leaflet Map:** Displays an interactive map of Calgary using Leaflet (leaflet@1.9.4) with Mapbox tiles.
 - **Custom Mapbox Style:** Integrates a custom Mapbox Studio style for visualizing:
@@ -84,4 +84,48 @@ The server will run on http://localhost:5000. You should see Road network loaded
    - Red marker for the end point.
 - **Popups for Interactivity:**
     - Clicking on a road segment shows details like road name and risk category.
-    
+
+### 3. Multiple Input Methods for Route Requests
+
+- **Manual Map Clicks:**
+    - Click on the map to set the start point (green marker).
+    - Click again to set the end point (red marker).
+    - The route is automatically calculated and displayed.
+- **Textbox Input:**
+    - Enter start and end locations (e.g., "Calgary Tower" and "University Station, Calgary") in the Route Planner pane.
+    - Optionally enter coordinates manually (latitude and longitude).
+    - Click "Find Path" to calculate the route.
+- **Chatbot Interface:**
+    - Use natural language to request routes (e.g., "Find a route from Calgary Tower to University Station, Calgary").
+    - The chatbot parses the request, geocodes the locations, and displays the route on the map.
+
+### 4. Chatbot for Natural Language Interaction
+
+- **Natural Language Parsing:** Parses user input to extract start and end locations using regex patterns (e.g., "from X to Y").
+- **Geocoding Integration:** Converts location names to coordinates using the Geoapify API.
+- **Route Response:** Returns a formatted route plan as an HTML list, including road names, distances, and total travel time.
+- **User-Friendly Interface:**
+    - Chatbot window with a toggle to minimize/maximize.
+    - Styled messages (green for user, blue for bot).
+    - Supports Enter key to send messages.
+
+### 5. Geocoding and Location Handling
+- **Geoapify API Integration:** Converts location names to coordinates (latitude, longitude) using the Geoapify API.
+- **Calgary-Specific Adjustments:** Automatically appends ", Calgary, AB" to location names if "Calgary" is not specified, ensuring accurate geocoding within Calgary.
+- **Coordinate Validation:** Ensures start and end points are within Calgary bounds (lat: 50.842 to 51.212, lon: -114.315 to -113.860).
+
+### 6. Route Plan Display
+**Sidebar Route Plan:**
+    - Lists each road segment in the route with its name and distance (in kilometers).
+    - Removes duplicate road names while preserving order.
+    - Displays total distance and total travel time for the route.
+**Travel Time Formatting:** Converts travel time (in seconds) to a human-readable format (e.g., "15 min 30 sec").
+**Dynamic Updates:** Updates the route plan whenever a new route is calculated via map clicks, textboxes, or the chatbot.
+
+### 7. Custom Visualization with Mapbox Studio
+**Road Risk Visualization:** Road segments are styled based on the risk_category property from road_risk_layer_categorized.shp.
+**Example styling:**
+    ![image](https://github.com/user-attachments/assets/0eb0d0f9-359e-4410-afc8-9514c1c7e825)
+
+**Mapbox Studio Integration:**
+    - Styled in Mapbox Studio and integrated into Leaflet via a custom Mapbox style URL.
