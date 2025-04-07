@@ -203,6 +203,9 @@ While not currently implemented, the following features could be added to enhanc
 - ![image](https://github.com/user-attachments/assets/14d3b8af-9fcb-4e40-85b3-d984f2b567f8)
 
 - **Map Interface with Route Display**
+- Route Recommendation from Calgary Tower to Chinook Mall
+  ![image](https://github.com/user-attachments/assets/11bc4411-47bc-411c-960d-d788925a450f)
+  ![image](https://github.com/user-attachments/assets/831e3560-ec38-4500-9ea3-b81ca0463026)
 
 - **Route Planner Pane**
 - ![image](https://github.com/user-attachments/assets/8f14a9c0-7082-453e-80a7-70f998420363)
