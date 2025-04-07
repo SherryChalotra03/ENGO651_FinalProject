@@ -71,9 +71,15 @@ The server will run on http://localhost:5000. You should see Road network loaded
     - **Day of the Week:** Higher risk on weekdays with a weekday_factor.
     - **Season:** Higher risk in winter months (December–February) with a winter_factor.
 - **Customizable Cost Function:** Allows tuning the balance between distance (alpha) and risk (beta) in the pathfinding algorithm.
-**Precomputed Road Network:** Uses a precomputed NetworkX graph (road_network_processed.pkl) for efficient pathfinding in Calgary.
+- **Precomputed Road Network:** Uses a precomputed NetworkX graph (road_network_processed.pkl) for efficient pathfinding in Calgary.
 
-### 2. Interactive Map Interface
+### 2. IoT Integration for Real-Time Location Tracking
+- **MQTT-Based Location Updates:** Retrieves the user’s current location in real-time from an IoT device using the MQTT protocol.
+- **Automatic Start Point Setting:** Sets the user’s current location as the start point for route planning, eliminating the need for manual input.
+- **Dynamic Updates:** Continuously updates the start point as the user moves, ensuring the route reflects the latest location.
+- **Fallback Mechanism:** Allows manual start point selection if IoT location data is unavailable.
+
+### 3. Interactive Map Interface
 
 - **Leaflet Map:** Displays an interactive map of Calgary using Leaflet (leaflet@1.9.4) with Mapbox tiles.
 - **Custom Mapbox Style:** Integrates a custom Mapbox Studio style for visualizing:
@@ -85,7 +91,7 @@ The server will run on http://localhost:5000. You should see Road network loaded
 - **Popups for Interactivity:**
     - Clicking on a road segment shows details like road name and risk category.
 
-### 3. Multiple Input Methods for Route Requests
+### 4. Multiple Input Methods for Route Requests
 
 - **Manual Map Clicks:**
     - Click on the map to set the start point (green marker).
@@ -98,8 +104,9 @@ The server will run on http://localhost:5000. You should see Road network loaded
 - **Chatbot Interface:**
     - Use natural language to request routes (e.g., "Find a route from Calgary Tower to University Station, Calgary").
     - The chatbot parses the request, geocodes the locations, and displays the route on the map.
+- **IoT-Based Start Point:** Automatically uses the user’s current location from IoT data as the start point.
 
-### 4. Chatbot for Natural Language Interaction
+### 5. Chatbot for Natural Language Interaction
 
 - **Natural Language Parsing:** Parses user input to extract start and end locations using regex patterns (e.g., "from X to Y").
 - **Geocoding Integration:** Converts location names to coordinates using the Geoapify API.
@@ -109,36 +116,36 @@ The server will run on http://localhost:5000. You should see Road network loaded
     - Styled messages (green for user, blue for bot).
     - Supports Enter key to send messages.
 
-### 5. Geocoding and Location Handling
+### 6. Geocoding and Location Handling
 - **Geoapify API Integration:** Converts location names to coordinates (latitude, longitude) using the Geoapify API.
 - **Calgary-Specific Adjustments:** Automatically appends ", Calgary, AB" to location names if "Calgary" is not specified, ensuring accurate geocoding within Calgary.
 - **Coordinate Validation:** Ensures start and end points are within Calgary bounds (lat: 50.842 to 51.212, lon: -114.315 to -113.860).
 
-### 6. Route Plan Display
-**Sidebar Route Plan:**
+### 7. Route Plan Display
+- **Sidebar Route Plan:**
     - Lists each road segment in the route with its name and distance (in kilometers).
     - Removes duplicate road names while preserving order.
     - Displays total distance and total travel time for the route.
-**Travel Time Formatting:** Converts travel time (in seconds) to a human-readable format (e.g., "15 min 30 sec").
-**Dynamic Updates:** Updates the route plan whenever a new route is calculated via map clicks, textboxes, or the chatbot.
+- **Travel Time Formatting:** Converts travel time (in seconds) to a human-readable format (e.g., "15 min 30 sec").
+- **Dynamic Updates:** Updates the route plan whenever a new route is calculated via map clicks, textboxes, or the chatbot.
 
-### 7. Custom Visualization with Mapbox Studio
-**Road Risk Visualization:** Road segments are styled based on the risk_category property from road_risk_layer_categorized.shp.
-**Example styling:**
+### 8. Custom Visualization with Mapbox Studio
+- **Road Risk Visualization:** Road segments are styled based on the risk_category property from road_risk_layer_categorized.shp.
+- **Example styling:**
     ![image](https://github.com/user-attachments/assets/0eb0d0f9-359e-4410-afc8-9514c1c7e825)
 
-**Mapbox Studio Integration:**
+- **Mapbox Studio Integration:**
     - Styled in Mapbox Studio and integrated into Leaflet via a custom Mapbox style URL.
 
-### 8. User Interface Enhancements**
-**Loading Spinner:** Displays a loading spinner while the route is being calculated or data is being fetched.
-**Reset Functionality:**
+### 8. User Interface Enhancements
+- **Loading Spinner:** Displays a loading spinner while the route is being calculated or data is being fetched.
+- **Reset Functionality:**
     - Reset the map by clicking the "Reset" button or pressing the R key.
     - Clears markers, route, and input fields, and resets the map view to the default position.
-**Responsive Design:**
+- **Responsive Design:**
     - Sidebar for route planning and route plan display.
     - Chatbot window positioned in the bottom-right corner with a toggle to minimize/maximize.
-**Instructions:** Provides clear instructions on how to use the application (via the map interface).
+- **Instructions:** Provides clear instructions on how to use the application (via the map interface).
 
 ### 9.Backend Features
 - **Flask Server:**
@@ -172,10 +179,10 @@ The server will run on http://localhost:5000. You should see Road network loaded
     - Pathfinding logic is separated into find_path.py.
     - Chatbot logic is separated into chatbot.py.
     - Frontend logic is modularized in script.js.
-**Configurable Parameters:**
+- **Configurable Parameters:**
     - Pathfinding weights (alpha for distance, beta for risk) can be adjusted.
     - Risk adjustment factors (rush_hour_factor, weekday_factor, winter_factor) are configurable.
-**Customizable Visualization:**
+- **Customizable Visualization:**
     - Mapbox Studio allows easy updates to the styling of road segments and accidents.
     - Additional data layers can be added by uploading new tilesets to Mapbox Studio.
 ### 13. Security and Configuration
@@ -190,3 +197,20 @@ While not currently implemented, the following features could be added to enhanc
 - **Advanced Chatbot Capabilities:** Improve natural language understanding with NLP libraries (e.g., spaCy, Rasa).
 - **Mobile Responsiveness:** Optimize the UI for mobile devices.
 - **Incident Reporting:** Allow users to report new accidents or road hazards, updating the dataset in real-time.
+
+## Application in Action: Screenshots
+- **Map Interface with Route Display**
+
+- **Route Planner Pane**
+
+- **Chatbot Interaction**
+
+- **IoT Location Tracking**
+
+- **Risk Visualization on Map**
+
+
+## Contributors
+- Hafsa Irfan, M.Sc
+- Sherry Chalotra, PhD Geomatics Engineering
+- Zahra Indrageni - PhD Geomatics Engineering
