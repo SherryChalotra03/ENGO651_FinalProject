@@ -330,4 +330,26 @@ body {
     font-size: 18px;
 }
 
+/* Find My location */
+.primary-btn {
+    background-color: #28a745; /* green */
+    color: white;
+    border: none;
+    padding: 10px;
+    margin-top: 10px;
+    width: 100%;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .primary-btn:hover {
+    background-color: #218838;
+  }
+  
+  .primary-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 

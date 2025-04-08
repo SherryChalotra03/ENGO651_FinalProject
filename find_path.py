@@ -65,33 +65,33 @@ def find_nearest_node(G, point):
     return nodes[np.argmin(distances)]
 
 
-def dijkstra_path(G, start_node, end_node, current_time, alpha=1.0, beta=1.0):
-    """
-    Dijkstra's algorithm implementation balancing distance and risk.
+# def dijkstra_path(G, start_node, end_node, current_time, alpha=1.0, beta=1.0):
+#     """
+#     Dijkstra's algorithm implementation balancing distance and risk.
     
-    Parameters:
-    - G: NetworkX graph
-    - start_node: Starting node ID
-    - end_node: Destination node ID
-    - current_time: datetime object for dynamic risk adjustment
-    - alpha: Weight for distance (default: 1.0)
-    - beta: Weight for risk (default: 1.0)
+#     Parameters:
+#     - G: NetworkX graph
+#     - start_node: Starting node ID
+#     - end_node: Destination node ID
+#     - current_time: datetime object for dynamic risk adjustment
+#     - alpha: Weight for distance (default: 1.0)
+#     - beta: Weight for risk (default: 1.0)
     
-    Returns:
-    - List of nodes representing the shortest path, or None if no path exists
-    """
-    def cost(u, v, d):
-        length = float(G[u][v]['length'])
-        base_risk = float(G[u][v]['risk_score'])
-        adjusted_risk = adjust_risk_score(base_risk, current_time,
-                                          rush_hour_factor=2.0, weekday_factor=1.5, winter_factor=1.5)
-        # adjusted_risk = base_risk
-        # print(f"length: {length}, base_risk: {base_risk}, adjusted_risk: {adjusted_risk}")
-        return alpha * length + beta * adjusted_risk * length
+#     Returns:
+#     - List of nodes representing the shortest path, or None if no path exists
+#     """
+#     def cost(u, v, d):
+#         length = float(G[u][v]['length'])
+#         base_risk = float(G[u][v]['risk_score'])
+#         adjusted_risk = adjust_risk_score(base_risk, current_time,
+#                                           rush_hour_factor=2.0, weekday_factor=1.5, winter_factor=1.5)
+#         # adjusted_risk = base_risk
+#         # print(f"length: {length}, base_risk: {base_risk}, adjusted_risk: {adjusted_risk}")
+#         return alpha * length + beta * adjusted_risk * length
     
-    try:
-        # Using NetworkX's built-in dijkstra_path with our custom cost function
-        path = nx.dijkstra_path(G, start_node, end_node, weight=cost)
-        return path
-    except nx.NetworkXNoPath:
-        return None
+#     try:
+#         # Using NetworkX's built-in dijkstra_path with our custom cost function
+#         path = nx.dijkstra_path(G, start_node, end_node, weight=cost)
+#         return path
+#     except nx.NetworkXNoPath:
+#         return None

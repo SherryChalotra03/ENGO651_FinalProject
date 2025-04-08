@@ -1,110 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calgary Safe Way - Intelligent Route Planning</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="chatbot.css">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
-    <script src="config.js"></script>
-    <script src="chatbot.js" type="module"></script>
-    <script src="script.js" type="module" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calgary Safe Way - Intelligent Route Planning</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="chatbot.css" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Roboto:wght@300;400&display=swap" rel="stylesheet" />
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
+  <script src="config.js" defer></script>
+  <script src="chatbot.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
+
 <body>
-    <!-- Header with Project Title -->
-    <header class="app-header">
-        <h1>Calgary Safe Way</h1>
-        <p>Intelligent Route Planning for Calgary</p>
-    </header>
+  <!-- Header -->
+  <header class="app-header">
+    <h1>Calgary Safe Way</h1>
+    <p>Intelligent Route Planning for Calgary</p>
+  </header>
 
-    <!-- Top Pane with Title and Instructions -->
-    <!-- <div id="topPane">
-        <div id="title">
-            <h1>Calgary Safe Way</h1>
-            <p>Intelligent Route Planning for Calgary</p>
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Route Planner</h2>
+      <div class="control-pane">
+        <div class="input-group">
+          <label for="startLocation">Start Location:</label>
+          <input type="text" id="startLocation" placeholder="e.g., Calgary Tower" />
         </div>
-        <div id="instructions">
-            <h3>How to Find a Route</h3>
-            <ul>
-                <li><b>Manual Map Clicks:</b> Click on the map to set the Start point (green marker), then click again to set the End point (red marker). The path will appear in blue.</li>
-                <li><b>Textboxes:</b> Enter the Start and End locations in the Route Planner pane on the left, then click "Find Path."</li>
-                <li><b>Chatbot:</b> Use the Route Assistant (bottom right) to type your request, e.g., "Find a route from Calgary Tower to University Station, Calgary."</li>
-            </ul>
+        <div class="input-group">
+          <label for="endLocation">End Location:</label>
+          <input type="text" id="endLocation" placeholder="e.g., University Station, Calgary" />
         </div>
-    </div> -->
-
-    <!-- Main Container -->
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <h2>Route Planner</h2>
-            <div id="controlPane" class="control-pane">
-                <div class="input-group">
-                    <label for="startLocation">Start Location:</label>
-                    <input type="text" id="startLocation" placeholder="e.g., Calgary Tower">
-                </div>
-                <div class="input-group">
-                    <label for="endLocation">End Location:</label>
-                    <input type="text" id="endLocation" placeholder="e.g., University Station, Calgary">
-                </div>
-                <div class="button-group">
-                    <button id="findPathButton">Find Path</button>
-                    <button id="resetButton">Reset</button>
-                </div>
-                <p class="coord-info">Or enter coordinates manually (latitude, longitude):</p>
-                <div class="input-group coord-group">
-                    <label for="startLat">Start Coordinates:</label>
-                    <div class="coord-inputs">
-                        <input type="number" id="startLat" step="0.0001" placeholder="Latitude">
-                        <input type="number" id="startLon" step="0.0001" placeholder="Longitude">
-                    </div>
-                </div>
-                <div class="input-group coord-group">
-                    <label for="endLat">End Coordinates:</label>
-                    <div class="coord-inputs">
-                        <input type="number" id="endLat" step="0.0001" placeholder="Latitude">
-                        <input type="number" id="endLon" step="0.0001" placeholder="Longitude">
-                    </div>
-                </div>
-            </div>
-            <div id="routePlan" class="route-plan">
-                <h3>Route Plan</h3>
-                <ul id="routeSteps"></ul>
-            </div>
+        <div class="button-group">
+          <button id="findPathButton">Find Path</button>
+          <button id="resetButton">Reset</button>
         </div>
-
-        <!-- Map Container -->
-        <div class="map-container">
-            <div id="map"></div>
-            <div id="instructions">Click to set Start (green), then End (red). Path will appear in blue. Or use the pane on the left.</div>
-            <!-- Loading Spinner -->
-            <div id="loadingSpinner" class="loading-spinner">
-                <div class="spinner"></div>
-                <p>Finding your route...</p>
-            </div>
+        <p class="coord-info">Or enter coordinates manually (latitude, longitude):</p>
+        <div class="input-group coord-group">
+          <label for="startLat">Start Coordinates:</label>
+          <div class="coord-inputs">
+            <input type="number" id="startLat" step="0.0001" placeholder="Latitude" />
+            <input type="number" id="startLon" step="0.0001" placeholder="Longitude" />
+          </div>
         </div>
-
-        <!-- Chat Interface -->
-        <div class="chat-container" id="chatContainer">
-            <div class="chat-header">
-                <h3>Route Assistant</h3>
-                <button class="chat-toggle" id="chatToggle">−</button>
-            </div>
-            <div class="chat-body" id="chatBody">
-                <div class="chat-message bot">
-                    <div class="message-content">Hello! I can help you find routes in Calgary. Try saying something like: "Find a route from Calgary Tower to University Station, Calgary."</div>
-                </div>
-            </div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" placeholder="Type your message...">
-                <button id="chatSend">Send</button>
-            </div>
+        <div class="input-group">
+          <button id="detectLocationBtn" class="primary-btn">
+            📍 Use My Current Location
+          </button>
+          
         </div>
+        <div class="input-group coord-group">
+          <label for="endLat">End Coordinates:</label>
+          <div class="coord-inputs">
+            <input type="number" id="endLat" step="0.0001" placeholder="Latitude" />
+            <input type="number" id="endLon" step="0.0001" placeholder="Longitude" />
+          </div>
+        </div>
+      </div>
+      <div class="route-plan">
+        <h3>Route Plan</h3>
+        <ul id="routeSteps"></ul>
+      </div>
     </div>
+
+    <!-- Map Container -->
+    <div class="map-container">
+      <div id="map"></div>
+      <div id="instructions">Click to set Start (green), then End (red). Path will appear in blue. Or use the pane on the left.</div>
+      <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Finding your route...</p>
+      </div>
+    </div>
+
+    <!-- Chatbot -->
+    <div class="chat-container" id="chatContainer">
+      <div class="chat-header">
+        <h3>Route Assistant</h3>
+        <button class="chat-toggle" id="chatToggle">−</button>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <div class="chat-message bot">
+          <div class="message-content">
+            Hello! I can help you find routes in Calgary. Try saying something like: "Find a route from Calgary Tower to University Station, Calgary."
+          </div>
+        </div>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Type your message..." />
+        <button id="chatSend">Send</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
