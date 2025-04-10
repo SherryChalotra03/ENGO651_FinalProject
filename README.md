@@ -220,6 +220,6 @@ While not currently implemented, the following features could be added to enhanc
 - ![image](https://github.com/user-attachments/assets/ecb37847-b791-4574-9041-5fab3ea1b13a)
 
 ## Contributors
-- Hafsa Irfan, MENG Geomatics Engineering
+- Hafsa Irfan, MEng Geomatics Engineering
 - Sherry Chalotra, PhD Geomatics Engineering
 - Zahra Irandegani, PhD Geomatics Engineering
