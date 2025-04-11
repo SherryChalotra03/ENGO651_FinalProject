@@ -198,7 +198,7 @@ While not currently implemented, the following features could be added to enhanc
 
 ## Application in Action: Screenshots
 1. **Application Interface**
-- ![image](https://github.com/user-attachments/assets/14d3b8af-9fcb-4e40-85b3-d984f2b567f8)
+ ![image](https://github.com/user-attachments/assets/14d3b8af-9fcb-4e40-85b3-d984f2b567f8)
 
 2. **Map Interface with Route Display**
 - Route Recommendation from Calgary Tower to Chinook Mall
@@ -207,16 +207,16 @@ While not currently implemented, the following features could be added to enhanc
 
 
 3. **Route Planner Pane**
-- ![image](https://github.com/user-attachments/assets/8f14a9c0-7082-453e-80a7-70f998420363)
+![image](https://github.com/user-attachments/assets/8f14a9c0-7082-453e-80a7-70f998420363)
 
 4. **Chatbot Interaction**
-- ![image](https://github.com/user-attachments/assets/682c80d7-6992-4a13-9ce0-a2c8b6566d99)
+![image](https://github.com/user-attachments/assets/682c80d7-6992-4a13-9ce0-a2c8b6566d99)
 
 5. **IoT Location Tracking**
 ![image](https://github.com/user-attachments/assets/bb668fa6-e3d0-4d8a-985b-c8224c739871)
 
 6. **Accident Hotspot Visualization on Map**
-- ![image](https://github.com/user-attachments/assets/ecb37847-b791-4574-9041-5fab3ea1b13a)
+![image](https://github.com/user-attachments/assets/ecb37847-b791-4574-9041-5fab3ea1b13a)
 
 6. **Risk Visualization on Map**
 ![image](https://github.com/user-attachments/assets/f41654d0-0bf8-4630-88df-92bee63593e7)
