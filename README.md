@@ -215,8 +215,13 @@ While not currently implemented, the following features could be added to enhanc
 5. **IoT Location Tracking**
 ![image](https://github.com/user-attachments/assets/bb668fa6-e3d0-4d8a-985b-c8224c739871)
 
-6. **Risk Visualization on Map**
+6. **Accident Hotspot Visualization on Map**
 - ![image](https://github.com/user-attachments/assets/ecb37847-b791-4574-9041-5fab3ea1b13a)
+
+6. **Risk Visualization on Map**
+![image](https://github.com/user-attachments/assets/f41654d0-0bf8-4630-88df-92bee63593e7)
+
+
 
 ## Example
 "User → Frontend (JS): "Submit request: 'Find a route from Calgary Tower to University Station, Calgary'"
