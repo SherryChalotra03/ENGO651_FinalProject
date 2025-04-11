@@ -218,21 +218,21 @@ While not currently implemented, the following features could be added to enhanc
 - ![image](https://github.com/user-attachments/assets/ecb37847-b791-4574-9041-5fab3ea1b13a)
 
 ## Example
-"User → Frontend (JS): "Submit request: 'Find a route from Calgary Tower to University Station, Calgary'"
-Frontend (JS) → Backend (Flask): "AJAX POST /chat with request text"
-Backend (Flask) → Backend (Flask): "Parse request using regex"
-Backend (Flask) → Geoapify API: "Geocode start and end locations"
-Geoapify API → Backend (Flask): "Return coordinates (e.g., 51.048615, -114.063245)"
-Backend (Flask) → Backend (Flask): "Validate coordinates within Calgary bounds"
-Backend (Flask) → Backend (Flask): "Find nearest nodes"
-Backend (Flask) → Routing Engine: "Fetch graph and risk data"
-Routing Engine → Data Layer: "Fetch graph and risk scores"
-Data Layer → Routing Engine: "Return nodes, edges, risk scores"
-Backend (Flask) → Routing Engine: "Run A* with risk"
-Routing Engine → Backend (Flask): "Return computed path"
-Backend (Flask) → Backend (Flask): "Format route plan as HTML list"
-Backend (Flask) → Frontend (JS): "GeoJSON route and HTML route plan"
-Frontend (JS) → User: "Render route on map, display route plan and risk details in chatbot window"" 
+- "User → Frontend (JS): "Submit request: 'Find a route from Calgary Tower to University Station, Calgary'"
+- Frontend (JS) → Backend (Flask): "AJAX POST /chat with request text"
+- Backend (Flask) → Backend (Flask): "Parse request using regex"
+- Backend (Flask) → Geoapify API: "Geocode start and end locations"
+- Geoapify API → Backend (Flask): "Return coordinates (e.g., 51.048615, -114.063245)"
+- Backend (Flask) → Backend (Flask): "Validate coordinates within Calgary bounds"
+- Backend (Flask) → Backend (Flask): "Find nearest nodes"
+- Backend (Flask) → Routing Engine: "Fetch graph and risk data"
+- Routing Engine → Data Layer: "Fetch graph and risk scores"
+- Data Layer → Routing Engine: "Return nodes, edges, risk scores"
+- Backend (Flask) → Routing Engine: "Run A* with risk"
+- Routing Engine → Backend (Flask): "Return computed path"
+- Backend (Flask) → Backend (Flask): "Format route plan as HTML list"
+- Backend (Flask) → Frontend (JS): "GeoJSON route and HTML route plan"
+- Frontend (JS) → User: "Render route on map, display route plan and risk details in chatbot window"" 
 
 ## Contributors
 - Hafsa Irfan, MEng Geomatics Engineering
