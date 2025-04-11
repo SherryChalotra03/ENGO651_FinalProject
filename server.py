@@ -137,9 +137,16 @@ def find_path():
                 road_name = row.get('ref', None)
             if pd.isna(road_name):
                 road_name = row.get('highway', 'Unnamed Road').capitalize()
+            length = row.get('length', 0)
+            # Always compute travel time, ignoring precomputed values
+            speed_mps = 13.89  # 50 km/h = 13.89 m/s
+            edge_travel_time = length / speed_mps if length else 0
+            route_gdf_4326.at[idx, 'travel_time'] = edge_travel_time
+    
+            # Add this edge's travel time to the total
+            total_travel_time += edge_travel_time
 
-            total_travel_time += row.get('travel_time', 0)
-            total_length += row.get('length', 0)
+                      
 
             features.append({
                 "type": "Feature",
@@ -148,7 +155,7 @@ def find_path():
                     "osmid": row.get('road_id', None),
                     "name": road_name,
                     "length": row.get('length', None),
-                    "travel_time": row.get('travel_time', None),
+                    "travel_time": edge_travel_time,
                     "total_risk": row.get('total_risk', None),
                     "risk_category": row.get('risk_categ', None)
                 }

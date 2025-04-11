@@ -152,6 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     map.setView([latitude, longitude], 14); // ✅ map is in scope here
                     if (startMarker) map.removeLayer(startMarker);
                     startMarker = L.marker([latitude, longitude], { icon: greenIcon }).addTo(map).bindPopup("Current Location (Start)").openPopup();
+                    // startMarker = L.marker([latitude, longitude], { icon: greenIcon }).addTo(map); // Remove .bindPopup and .openPopup
                     startPoint = [latitude, longitude];
 
                     detectBtn.innerText = "Use My Current Location";
@@ -182,8 +183,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 const startLoc = document.getElementById('startLocation').value.trim();
                 const endLoc = document.getElementById('endLocation').value.trim();
 
-                if (startLoc && !start) start = await geocodeLocation(startLoc);
-                if (endLoc && !end) end = await geocodeLocation(endLoc);
+                if (startLoc && !start) {
+                    start = await geocodeLocation(startLoc);
+                    if (start) {
+                        document.getElementById('startLat').value = start[0].toFixed(6);
+                        document.getElementById('startLon').value = start[1].toFixed(6);
+                    }
+                }
+                if (endLoc && !end) {
+                    end = await geocodeLocation(endLoc);
+                    if (end) {
+                        document.getElementById('endLat').value = end[0].toFixed(6);
+                        document.getElementById('endLon').value = end[1].toFixed(6);
+                    }
+                }
 
                 if (!start) {
                     const lat = parseFloat(document.getElementById('startLat').value);
@@ -205,8 +218,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (startMarker) map.removeLayer(startMarker);
                 if (endMarker) map.removeLayer(endMarker);
-                startMarker = L.marker(start, { icon: greenIcon }).addTo(map).bindPopup('Start').openPopup();
-                endMarker = L.marker(end, { icon: redIcon }).addTo(map).bindPopup('End').openPopup();
+                // startMarker = L.marker(start, { icon: greenIcon }).addTo(map).bindPopup('Start').openPopup();
+                // endMarker = L.marker(end, { icon: redIcon }).addTo(map).bindPopup('End').openPopup();
+
+                startMarker = L.marker(start, { icon: greenIcon }).addTo(map);
+                endMarker = L.marker(end, { icon: redIcon }).addTo(map);
 
                 fetch('http://localhost:5000/find_path', {
                     method: 'POST',
@@ -298,9 +314,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!startPoint) {
                     startPoint = [e.latlng.lat, e.latlng.lng];
                     startMarker = L.marker(startPoint, { icon: greenIcon }).addTo(map).bindPopup("Start").openPopup();
+                    document.getElementById('startLat').value = startPoint[0].toFixed(6); // Add this to update text boxes
+                    document.getElementById('startLon').value = startPoint[1].toFixed(6);
                 } else if (!endPoint) {
                     endPoint = [e.latlng.lat, e.latlng.lng];
                     endMarker = L.marker(endPoint, { icon: redIcon }).addTo(map).bindPopup("End").openPopup();
+                    document.getElementById('endLat').value = endPoint[0].toFixed(6); // Add this to update text boxes
+                    document.getElementById('endLon').value = endPoint[1].toFixed(6);
                     findPath(); 
                 }
             });
@@ -345,8 +365,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             startPoint = data.start_coords;
                             endPoint = data.end_coords;
 
-                            startMarker = L.marker(startPoint, { icon: greenIcon }).addTo(map).bindPopup('Start').openPopup();
-                            endMarker = L.marker(endPoint, { icon: redIcon }).addTo(map).bindPopup('End').openPopup();
+                            // startMarker = L.marker(startPoint, { icon: greenIcon }).addTo(map).bindPopup('Start').openPopup();
+                            // endMarker = L.marker(endPoint, { icon: redIcon }).addTo(map).bindPopup('End').openPopup();
+                            startMarker = L.marker(startPoint, { icon: greenIcon }).addTo(map); // Remove .bindPopup and .openPopup
+                            endMarker = L.marker(endPoint, { icon: redIcon }).addTo(map); // Remove .bindPopup and .openPopup
 
                             pathLayer = L.geoJSON(data.route_geojson, {
                                 style: { color: 'blue', weight: 3 },
