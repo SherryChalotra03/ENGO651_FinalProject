@@ -213,6 +213,7 @@ While not currently implemented, the following features could be added to enhanc
 - ![image](https://github.com/user-attachments/assets/682c80d7-6992-4a13-9ce0-a2c8b6566d99)
 
 5. **IoT Location Tracking**
+![image](https://github.com/user-attachments/assets/bb668fa6-e3d0-4d8a-985b-c8224c739871)
 
 6. **Risk Visualization on Map**
 - ![image](https://github.com/user-attachments/assets/ecb37847-b791-4574-9041-5fab3ea1b13a)
