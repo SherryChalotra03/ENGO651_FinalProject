@@ -74,7 +74,7 @@ The server will run on http://localhost:5000. You should see Road network loaded
 - **Precomputed Road Network:** Uses a precomputed NetworkX graph (road_network_processed.pkl) for efficient pathfinding in Calgary.
 
 ### 2. IoT Integration for Real-Time Location Tracking
-- **MQTT-Based Location Updates:** Retrieves the user’s current location in real-time from an IoT device using the MQTT protocol.
+- **IOT-Based Location Updates:** user location tracking using the navigator.geolocation.getCurrentPosition API. When the user clicks the "Use My Current Location" button, this API requests the device’s geolocation, retrieving the latitude and longitude coordinates with high accuracy.
 - **Automatic Start Point Setting:** Sets the user’s current location as the start point for route planning, eliminating the need for manual input.
 - **Dynamic Updates:** Continuously updates the start point as the user moves, ensuring the route reflects the latest location.
 - **Fallback Mechanism:** Allows manual start point selection if IoT location data is unavailable.
