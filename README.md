@@ -1,12 +1,12 @@
 # ENGO651_FinalProject: Calgary Safe Way - Intelligent Route Planning
 
 ## Overview: 
-Calgary Safe Way is an intelligent route planning application designed for the city of Calgary, Alberta, Canada. It helps users find the safest and most efficient driving routes by considering road risk levels and historical accident data. The application features a web-based interface with a Leaflet map, a chatbot for natural language route requests, and a backend powered by Flask and NetworkX for pathfinding. It also integrates IoT functionality using MQTT to retrieve the user’s current location in real-time, automatically setting it as the starting point for route planning. Road segments and accidents are visualized using custom tilesets created in Mapbox Studio.
+Calgary Safe Way is an intelligent route-planning application designed for the city of Calgary, Alberta, Canada. It helps users find the safest and most efficient driving routes by considering road risk levels and historical accident data. The application features a web-based interface with a Leaflet map, a chatbot for natural language route requests, and a backend powered by Flask and NetworkX for pathfinding. It retrieves the user’s current location in real time using the browser’s Geolocation API, simulating IoT-based location tracking to automatically set the starting point for route planning. Road segments and accidents are visualized using custom tilesets created in Mapbox Studio.
 
 ## Project Structure
 
 - `server.py`: Flask backend for route calculation and API key serving.
-- `index.html`: Main HTML file for the frontend.
+- `index.html`: Main HTML file for the front end.
 - `script.js`: JavaScript file handling map interactions, geocoding, and route display.
 - `styles.css`: CSS for styling the map and sidebar.
 - `chatbot.css`: Styles for the chatbot interface
@@ -30,7 +30,7 @@ Calgary Safe Way is an intelligent route planning application designed for the c
     - source venv/bin/activate  # On Windows: venv\Scripts\activate
  
 - Install Dependencies: pip install -r requirements.txt
-- Set Up Environment Variables (Create .env file in project root and replace the placeholders with youractual keys)
+- Set Up Environment Variables (Create .env file in project root and replace the placeholders with your actual keys)
     - MAPBOX_ACCESS_TOKEN=your_mapbox_access_token_here
     - GEOAPIFY_API_KEY=your_geoapify_api_key_here
  
@@ -39,7 +39,7 @@ The server will run on http://localhost:5000. You should see Road network loaded
 
 ### 3. Set Up the Frontend
 - Navigate to the Project Directory
-- Start a Simple HTTP Server: In seperate terminal, start the server using python -m http.server 8000
+- Start a Simple HTTP Server: In a separate terminal, start the server using python -m http.server 8000
 - Open the Application: Open your browser and go to http://localhost:8000. The map should load, centered on Calgary.
 
 ### 4. Required files
@@ -147,7 +147,7 @@ The server will run on http://localhost:5000. You should see Road network loaded
     - Chatbot window positioned in the bottom-right corner with a toggle to minimize/maximize.
 - **Instructions:** Provides clear instructions on how to use the application (via the map interface).
 
-### 9.Backend Features
+### 9. Backend Features
 - **Flask Server:**
     - Handles API requests for pathfinding (/find_path), geocoding (/geocode), chatbot interactions (/chat), and configuration (/config).
     - Uses Flask-CORS to allow cross-origin requests from the frontend.
@@ -160,7 +160,7 @@ The server will run on http://localhost:5000. You should see Road network loaded
 
 ### 10. Error Handling and Validation
 - **Input Validation:**
-    - Ensures start and end points are within Calgary bounds.
+    - Ensure start and end points are within Calgary bounds.
     - Validates that geocoded locations are valid and within the road network.
 - **Error Messages:**
     - Displays user-friendly error messages in the UI (e.g., "Start point is outside Calgary bounds").
@@ -220,6 +220,6 @@ While not currently implemented, the following features could be added to enhanc
 - ![image](https://github.com/user-attachments/assets/ecb37847-b791-4574-9041-5fab3ea1b13a)
 
 ## Contributors
-- Hafsa Irfan, M.Sc
+- Hafsa Irfan, MEng Geomatics Engineering
 - Sherry Chalotra, PhD Geomatics Engineering
-- Zahra Irandegani - PhD Geomatics Engineering
+- Zahra Irandegani, PhD Geomatics Engineering
