@@ -192,10 +192,8 @@ The server will run on http://localhost:5000. You should see Road network loaded
 ## Potential Future Features
 While not currently implemented, the following features could be added to enhance the project:
 - **Real-Time Traffic and Weather Data:** Integrate live traffic data to adjust travel times and risk scores dynamically.
-- **Alternate Routes:** Provide multiple route options with different risk/distance trade-offs.
-- **User Preferences:** Allow users to prioritize safety, speed, or a balance of both in route planning.
 - **Advanced Chatbot Capabilities:** Improve natural language understanding with NLP libraries (e.g., spaCy, Rasa).
-- **Mobile Responsiveness:** Optimize the UI for mobile devices.
+- **Mobile Application:** Optimize the UI for mobile devices.
 - **Incident Reporting:** Allow users to report new accidents or road hazards, updating the dataset in real-time.
 
 ## Application in Action: Screenshots
